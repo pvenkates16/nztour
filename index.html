@@ -49,92 +49,52 @@
             display: none; /* Hide all excursion content except Christchurch by default (JS will manage visibility) */
         }
 
-        /* Chatbot Specific Styles */
-        #chatbot-container {
+        /* Chatbot Specific Styles for Container and Toggle */
+        #chatbot-wrapper {
             position: fixed;
             bottom: 20px;
             right: 20px;
             z-index: 1000;
         }
         #chat-window {
-            width: 320px;
-            height: 400px;
+            width: 350px; /* Slightly wider window */
+            height: 450px; /* Slightly taller window */
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            display: none;
-            flex-direction: column;
             overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
             transform: translateY(10px);
             opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none; /* Invisible when closed */
+            margin-bottom: 10px; /* Space above toggle button */
         }
         #chat-window.open {
-            display: flex;
             transform: translateY(0);
             opacity: 1;
+            pointer-events: auto; /* Interactive when open */
         }
-        #chat-header {
+        #chat-toggle-btn {
             background-color: #0e7490;
             color: white;
-            padding: 12px;
-            font-weight: bold;
+            padding: 1rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        #chat-toggle-btn:hover {
+            background-color: #06b6d4;
+            transform: scale(1.05);
+        }
+        #chat-window-header {
+            background-color: #0e7490;
+            color: white;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        #chat-messages {
-            flex-grow: 1;
-            padding: 10px;
-            overflow-y: auto;
-            background-color: #f9fafb;
-            line-height: 1.4;
-        }
-        .user-message {
-            text-align: right;
-            margin-bottom: 8px;
-        }
-        .user-message span {
-            display: inline-block;
-            background-color: #38bdf8;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 12px 12px 0 12px;
-            max-width: 80%;
-        }
-        .gemini-message {
-            text-align: left;
-            margin-bottom: 8px;
-        }
-        .gemini-message span {
-            display: inline-block;
-            background-color: #e5e7eb;
-            color: #374151;
-            padding: 8px 12px;
-            border-radius: 12px 12px 12px 0;
-            max-width: 80%;
-        }
-        #chat-input-form {
-            display: flex;
-            padding: 10px;
-            border-top: 1px solid #e5e7eb;
-        }
-        #chat-input-form input {
-            flex-grow: 1;
-            padding: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            margin-right: 8px;
-        }
-        #chat-input-form button {
-            background-color: #0e7490;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: background-color 0.15s;
-        }
-        #chat-input-form button:hover {
-            background-color: #06b6d4;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -496,26 +456,20 @@
 
     </main>
 
-    <!-- Chatbot Container -->
-    <div id="chatbot-container">
-        <div id="chat-window">
-            <div id="chat-header">
-                <span>Trip Assistant</span>
-                <button id="chat-close-btn" class="text-white hover:text-gray-300">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="chat-messages">
-                <div class="gemini-message">
-                    <span>Hello! I'm your trip assistant. I can answer questions about the itinerary, activities, or accommodation.</span>
-                </div>
-            </div>
-            <form id="chat-input-form">
-                <input type="text" id="chat-input" placeholder="Ask a question..." required>
-                <button type="submit"><i class="fas fa-paper-plane"></i></button>
-            </form>
+    <!-- Chatbot Container - Chatbase Integration -->
+    <div id="chatbot-wrapper">
+        <!-- Chat Window (Collapsible Container for the iframe) -->
+        <div id="chat-window" class="">
+            <iframe
+                src="https://www.chatbase.co/chatbot-iframe/Fbt7luegVnFml1NzyNUol"
+                width="100%"
+                style="height: 100%; min-height: 450px; border: none;"
+                frameborder="0"
+                allowfullscreen
+            ></iframe>
         </div>
-        <button id="chat-toggle-btn" class="bg-cyan-600 text-white p-4 rounded-full shadow-lg hover:bg-cyan-700 transition duration-150">
+        <!-- Toggle Button -->
+        <button id="chat-toggle-btn" class="absolute bottom-0 right-0">
             <i class="fas fa-comment text-xl"></i>
         </button>
     </div>
@@ -577,54 +531,24 @@
             setActiveTab(initialTargetId);
         });
 
-        // --- Chatbot Functionality ---
+        // --- Chatbot Toggle Functionality ---
         document.addEventListener('DOMContentLoaded', () => {
             const chatWindow = document.getElementById('chat-window');
             const chatToggleBtn = document.getElementById('chat-toggle-btn');
-            const chatCloseBtn = document.getElementById('chat-close-btn');
-            const chatInputForm = document.getElementById('chat-input-form');
-            const chatInput = document.getElementById('chat-input');
-            const chatMessages = document.getElementById('chat-messages');
+            
+            // Set initial state to collapsed (not open)
+            chatWindow.classList.remove('open'); 
 
-            // Toggle chat window visibility
             chatToggleBtn.addEventListener('click', () => {
                 chatWindow.classList.toggle('open');
-                // Change icon based on state (optional, keeping fixed icon for simplicity)
-            });
-
-            chatCloseBtn.addEventListener('click', () => {
-                chatWindow.classList.remove('open');
-            });
-            
-            // Function to add a message to the chat window
-            function addMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'gemini-message');
-                
-                const messageSpan = document.createElement('span');
-                messageSpan.textContent = text;
-                
-                messageDiv.appendChild(messageSpan);
-                chatMessages.appendChild(messageDiv);
-                
-                // Scroll to bottom
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
-            // Handle form submission (Simulated response)
-            chatInputForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const userQuery = chatInput.value.trim();
-                if (userQuery) {
-                    addMessage(userQuery, 'user');
-                    chatInput.value = '';
-                    
-                    // --- Simulated LLM Response ---
-                    setTimeout(() => {
-                        const response = "I'm sorry, I cannot fulfill requests that require a live LLM API call in this environment. I can only provide static information based on the itinerary.";
-                        addMessage(response, 'gemini');
-                    }, 1000); 
-                    // --- End Simulated LLM Response ---
+                // Optional: Change the button icon to an 'x' when open
+                const icon = chatToggleBtn.querySelector('i');
+                if (chatWindow.classList.contains('open')) {
+                    icon.classList.remove('fa-comment');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-comment');
                 }
             });
         });
