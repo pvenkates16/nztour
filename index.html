@@ -105,6 +105,13 @@
             font-weight: bold;
             cursor: pointer;
         }
+
+        /* Map Container Style for Positioning */
+        .map-container {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -143,9 +150,8 @@
             </div>
         </section>
 
-        <!-- NOTE: The Route Map & Overview section has been removed as requested. -->
-
-        <!-- Day-by-Day Itinerary (New Tabbed Structure) -->
+        <!-- The Route Map & Overview Section has been removed as requested. -->
+        <!-- Start of Day-by-Day Itinerary -->
         <section class="mb-16">
             <h2 class="text-3xl font-bold mb-8 text-gray-800">Day-by-Day Tour Itinerary</h2>
 
@@ -170,7 +176,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Sudima Christchurch City</h4>
                             <p class="text-sm text-gray-600 mb-2">49 Salisbury Street, Christchurch City. Check-in details available from your tour guide.</p>
-                            <a href="#sudima-chch" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Sudima Christchurch City →</a>
+                            <a href="https://www.sudimahotels.com/en/hotels/christchurch-city/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Sudima Christchurch City →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -220,7 +226,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Grand Suites Lake Tekapo</h4>
                             <p class="text-sm text-gray-600 mb-2">14 Greig Street, Lake Tekapo. Breakfast booked at The Godley Hotel Tasman Room (Day 5).</p>
-                            <a href="#grand-suites-tekapo" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Grand Suites Lake Tekapo →</a>
+                            <a href="https://grandsuitestekapo.co.nz/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Grand Suites Lake Tekapo →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -261,7 +267,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: The Hermitage Hotel Mount Cook</h4>
                             <p class="text-sm text-gray-600 mb-2">Terrace Road, Aoraki Mt Cook. Dinner reservations at Alpine Restaurant (buffet).</p>
-                            <a href="#hermitage-mt-cook" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Hermitage Hotel →</a>
+                            <a href="https://www.hermitage.co.nz/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Hermitage Hotel →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -309,7 +315,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: The Central Private Hotel by Naumi Hotels</h4>
                             <p class="text-sm text-gray-600 mb-2">4 Sydney Street, Queenstown. Includes daily breakfast and complimentary happy hour (5-6pm).</p>
-                            <a href="#central-private-hotel" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Central Private Hotel →</a>
+                            <a href="#central-private-hotel" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Central Private Hotel →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -365,7 +371,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Fiordland Lakeview Motel & Apartments</h4>
                             <p class="text-sm text-gray-600 mb-2">42 Lakefront Drive, Te Anau. Breakfast booked at Distinction Te Anau Hotel & Villas.</p>
-                            <a href="#fiordland-lakeview-motel" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Fiordland Lakeview Motel →</a>
+                            <a href="#fiordland-lakeview-motel" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Fiordland Lakeview Motel →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -374,7 +380,7 @@
                             <p class="text-sm text-gray-500 mb-4">Days 10-11</p>
                             <ul class="list-none space-y-3 text-gray-700">
                                 <li><span class="font-semibold">Day 10 (Glowworms):</span> Drive from Queenstown. Afternoon: <span class="text-blue-600">Te Anau Glowworm Caves Tour</span> (cruise across Lake Te Anau, underground waterfall, and glowworm grotto).</li>
-                                <li><span class="font-semibold">Day 11 (Fiordland):</span> Day trip drive on the scenic Milford Road (allow 2.5hrs each way). Scheduled: <span class="text-blue-600">Milford Sound Nature Cruise</span> (up-close views of waterfalls, seals, and dramatic rock faces).</li>
+                                <li><span class="font-semibold">Day 11 (Fiordland):</span> Day trip drive on the scenic Milford Road (allow 2.5hrs each way). Scheduled: <span class="text-blue-600">Milford Sound Nature Cruise.</span></li>
                             </ul>
                         </div>
 
@@ -413,7 +419,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Pullman Hotel Rotorua</h4>
                             <p class="text-sm text-gray-600 mb-2">1135 Arawa Street, Rotorua. A contemporary hotel in the heart of the city.</p>
-                            <a href="#pullman-rotorua" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Pullman Hotel Rotorua →</a>
+                            <a href="#pullman-rotorua" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Pullman Hotel Rotorua →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -461,7 +467,7 @@
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Horizon by SkyCity</h4>
                             <p class="text-sm text-gray-600 mb-2">85 Hobson Street, Auckland. Located near the iconic Sky Tower.</p>
-                            <a href="#horizon-skycity" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Horizon by SkyCity →</a>
+                            <a href="#horizon-skycity" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Horizon by SkyCity →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
