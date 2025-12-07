@@ -11,10 +11,10 @@
         /* --- CORE STYLES --- */
         body { 
             font-family: 'Inter', sans-serif; 
-            /* * NEW: Scenic Gradient Background (Mimics NZ Lake/Glacier colors) */
+            /* Scenic Gradient Background (Mimics NZ Lake/Glacier colors) */
             background: linear-gradient(180deg, #d4f2ff 0%, #38bdf8 45%, #0e7490 100%);
             background-attachment: fixed;
-            min-height: 100vh; /* Ensure the gradient covers the whole viewport */
+            min-height: 100vh; 
             position: relative; 
         }
         
@@ -23,12 +23,25 @@
             content: none !important; 
         }
 
-        /* All content cards must have a solid, highly visible background */
+        /* * CRITICAL CHANGE: Semi-Translucent Content Cards *
+         * Background color is set to 85% opaque white (rgba(255, 255, 255, 0.85)) 
+         * to allow the 3D background to show through slightly.
+         */
         .content-card-bg {
-            background-color: white; 
+            background-color: rgba(255, 255, 255, 0.85); 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
             position: relative;
             z-index: 10;
+        }
+        
+        /* Apply 85% opacity to the tab content panel as well (was solid white) */
+        #tab-content {
+            background-color: rgba(255, 255, 255, 0.85); 
+        }
+        
+        /* Apply 85% opacity to the tab navigation panel as well (was solid white) */
+        #tab-nav {
+            background-color: rgba(255, 255, 255, 0.85);
         }
 
         .hero-bg {
@@ -80,6 +93,16 @@
             color: #d97706; /* Amber orange (Suggested/TBD) */
         }
 
+        /* --- THREE.JS SPECIFIC STYLES --- */
+        #threejs-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; /* Important: Ensures it sits behind all content */
+        }
+        
         /* Chatbot Specific Styles for Container and Toggle */
         #chatbot-wrapper {
             position: fixed;
@@ -137,6 +160,8 @@
     </style>
 </head>
 <body class="antialiased">
+
+    <div id="threejs-background"></div>
 
     <header class="hero-bg py-24 text-white">
         <div class="container mx-auto px-4 text-center">
@@ -698,6 +723,129 @@
             <i class="fas fa-comment text-xl"></i>
         </button>
     </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Global array to hold all sphere objects for manipulation
+        const spheres = [];
+        const NUM_SPHERES = 14;
+        
+        // --- Speed Adjustment is here ---
+        const SPEED_FACTOR = 0.035; // Increased overall magnitude of speed
+
+        // 1. Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('threejs-background').appendChild(renderer.domElement);
+
+        camera.position.z = 20;
+        renderer.setClearColor(0x000000, 0); 
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // 2. Lighting Setup (Increased intensity for brighter, silvery look)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2); // Increased intensity 
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5); // Increased intensity
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        const fillLight = new THREE.DirectionalLight(0xaaaaaa, 1.0); // Increased intensity
+        fillLight.position.set(-5, -5, -5);
+        scene.add(fillLight);
+
+
+        // 3. Sphere Creation (Geometry and Material)
+        const geometry = new THREE.SphereGeometry(1, 32, 32);
+
+        // Material for Translucent Silver (Reduced roughness for more shine)
+        const silverTranslucentMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xcccccc,          
+            metalness: 1.0,           
+            roughness: 0.05,          // Reduced to make it more mirror-like/silvery
+            transparent: true,        
+            opacity: 0.7,             
+            transmission: 0.9,        
+            ior: 1.5,                 
+            thickness: 0.5,           
+        });
+
+        // Function to generate speed within a narrow, consistent range (0.25 to 0.5)
+        function generateNarrowSpeed() {
+            // Generates a random number between 0.25 and 0.50
+            return (Math.random() * 0.25 + 0.25);
+        }
+
+        // Function to create and position the 14 spheres
+        function createSpheres() {
+            for (let i = 0; i < NUM_SPHERES; i++) {
+                const sphere = new THREE.Mesh(geometry, silverTranslucentMaterial);
+                
+                sphere.position.x = (Math.random() - 0.5) * 30;
+                sphere.position.y = (Math.random() - 0.5) * 30;
+                sphere.position.z = (Math.random() - 0.5) * 30;
+                
+                // Determine direction (+1 or -1) randomly
+                const dirX = Math.random() < 0.5 ? -1 : 1;
+                const dirY = Math.random() < 0.5 ? -1 : 1;
+                const dirZ = Math.random() < 0.5 ? -1 : 1;
+
+                // NARROW SPEED RANGE APPLIED: Consistent, faster movement
+                sphere.speedX = generateNarrowSpeed() * SPEED_FACTOR * dirX; 
+                sphere.speedY = generateNarrowSpeed() * SPEED_FACTOR * dirY;
+                sphere.speedZ = generateNarrowSpeed() * SPEED_FACTOR * dirZ;
+                
+                scene.add(sphere);
+                spheres.push(sphere);
+            }
+        }
+
+        createSpheres();
+        
+        // 4. Animation Loop
+        const boxSize = 25; 
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update sphere positions
+            spheres.forEach(sphere => {
+                sphere.position.x += sphere.speedX;
+                sphere.position.y += sphere.speedY;
+                sphere.position.z += sphere.speedZ;
+
+                // Boundary checking
+                if (sphere.position.x > boxSize || sphere.position.x < -boxSize) {
+                    sphere.speedX *= -1;
+                }
+                if (sphere.position.y > boxSize || sphere.position.y < -boxSize) {
+                    sphere.speedY *= -1;
+                }
+                if (sphere.position.z > boxSize || sphere.position.z < -boxSize) {
+                    sphere.speedZ *= -1;
+                }
+                
+                sphere.rotation.x += 0.001;
+                sphere.rotation.y += 0.002;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+    </script>
+
 
     <script>
         // --- Tab Functionality ---
