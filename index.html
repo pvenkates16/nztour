@@ -8,16 +8,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7fafc; }
+        /* --- CORE STYLES --- */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #3b82f6; /* Blue base for fallback */
+            /* * NEW: Full-Page Background Image (Mountains) */
+            background-image: url('https://images.pexels.com/photos/1022479/pexels-photo-1022479.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-repeat: no-repeat;
+            background-size: cover; 
+            background-attachment: fixed;
+            background-position: center;
+            position: relative; /* Needed for the pseudo-element overlay */
+        }
+        
+        /* * CRITICAL FIX: Pseudo-element to dim the background image for readability *
+         * This applies a nearly opaque white filter over the background image only, 
+         * without affecting the actual text or content opacity.
+         */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(247, 250, 252, 0.85); /* 85% opacity of the body's base color */
+            z-index: -1;
+        }
+
+        /* All content cards must have a solid, highly visible background */
+        .content-card-bg {
+            background-color: white; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            /* Ensure content cards stack above the body overlay */
+            position: relative;
+            z-index: 10;
+        }
+
         .hero-bg {
-            /* Using a scenic placeholder image URL */
-            /* Updated image to Lake Pukaki photo as requested */
+            /* Keep the main hero image high contrast */
             background-image: url('https://img.freepik.com/free-photo/landscape-lake-pukaki-pukaki-new-zealand-surrounded-with-snowy-mountains_181624-26720.jpg?semt=ais_hybrid&w=740&q=80');
             background-size: cover;
             background-position: center;
             border-bottom-left-radius: 3rem;
             border-bottom-right-radius: 3rem;
+            z-index: 10;
         }
+        
         .tour-card {
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
@@ -124,7 +161,7 @@
 
     <main class="container mx-auto px-4 py-12">
 
-        <section class="mb-16 p-8 bg-white rounded-xl shadow-lg border-t-4 border-cyan-500">
+        <section class="mb-16 p-8 content-card-bg rounded-xl shadow-lg border-t-4 border-cyan-500">
             <h2 class="text-3xl font-bold mb-4 text-gray-800">Aotearoa: History of Settlement</h2>
             <p class="text-gray-600 mb-6">
                 New Zealand (Aotearoa) and Australia have distinct settlement histories. New Zealand was one of the last habitable lands to be settled by humans, with Polynesians (who developed into the Māori culture) arriving in ocean-going canoes (`waka`) between **1250 and 1300 CE**. The discovery was a planned and deliberate event that occurred over several decades.
@@ -149,7 +186,7 @@
         <section class="mb-16">
             <h2 class="text-3xl font-bold mb-8 text-gray-800">Day-by-Day Tour Itinerary</h2>
 
-            <div id="tab-nav" class="flex flex-wrap border-b border-gray-200 -mb-px">
+            <div id="tab-nav" class="flex flex-wrap border-b border-gray-200 -mb-px content-card-bg">
                 <button data-tab-target="Christchurch" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Christchurch (3 Nights)</button>
                 <button data-tab-target="LakeTekapo" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Lake Tekapo (1 Night)</button>
                 <button data-tab-target="MountCook" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Mt Cook (2 Nights)</button>
@@ -159,7 +196,7 @@
                 <button data-tab-target="Auckland" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Auckland (2 Nights)</button>
             </div>
 
-            <div id="tab-content" class="p-6 bg-white rounded-b-xl shadow-xl border-t-2 border-gray-200">
+            <div id="tab-content" class="p-6 content-card-bg rounded-b-xl shadow-xl border-t-2 border-gray-200">
                 
                 <div data-tab-content="Christchurch" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
@@ -497,16 +534,18 @@
             </div>
         </section>
 
-        <section id="dynamic-excursions-container" class="mb-12 p-8 bg-blue-50 rounded-xl shadow-lg">
+        <section id="dynamic-excursions-container" class="mb-12 p-8 bg-blue-50 content-card-bg rounded-xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">Local Excursions & Notes</h2>
             
             <div id="excursions-Christchurch" class="excursion-content" data-excursion-for="Christchurch">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 1-3)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Christchurch:** Explore the Avon River, Botanic Gardens, Canterbury Museum, and the Gothic-style Arts Centre.</li>
-                            <li>**Kaikoura Excursion:** Look for marine life besides whales (fur seals, dolphins, albatross) and try local seafood delicacies like crayfish.</li>
+                            <li>**Scheduled Activities:** Christchurch Tram Pass (Day 2) and Whale Watch Cruise Kaikoura (Day 3).</li>
+                            <li>**Christchurch City:** Explore the Avon River on a punt, or visit the historic Arts Centre and Canterbury Museum.</li>
+                            <li>**Alternative:** Visit the **International Antarctic Centre** or take the scenic **Christchurch Gondola** for city views.</li>
+                            <li>**Dining & Culture:** Explore the **Riverside Market** for food or follow the city's extensive **Street Art Trail**.</li>
                         </ul>
                     </div>
                     <div>
@@ -514,6 +553,7 @@
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**TranzAlpine Journey (Day 4 start):** Considered one of the world's great train journeys, crossing the Southern Alps.</li>
                             <li>**Woodend & Amberley:** Scenic surf beaches passed on the drive north to Kaikoura (Day 3).</li>
+                            <li>**Kaikoura Excursion:** Look for marine life besides whales (fur seals, dolphins, albatross) and try local seafood delicacies like crayfish.</li>
                         </ul>
                     </div>
                 </div>
@@ -522,18 +562,20 @@
             <div id="excursions-LakeTekapo" class="excursion-content" data-excursion-for="LakeTekapo">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 4)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Mackenzie Sheep Dog Statue:** A famous photo opportunity near the Church of the Good Shepherd.</li>
-                            <li>**Tekapo Springs:** Offers hot pools, spas, and relaxation options.</li>
-                            <li>**Aoraki Mackenzie International Dark Sky Reserve:** The best place in NZ for stargazing, with minimal light pollution.</li>
-                        </ul>
+                            <li>**Scheduled Activity:** Summit Experience Stargazing Tour (Evening).</li>
+                            <li>**Daytime:** Visit the iconic **Church of the Good Shepherd** and the **Mackenzie Sheep Dog Statue**.</li>
+                            <li>**Alternative:** Relax at **Tekapo Springs** (hot pools/spa) or hike the **Mount John Summit Track** for panoramic views.</li>
+                            <li>**Dark Sky:** The area is part of the Aoraki Mackenzie International Dark Sky Reserve, offering unparalleled night sky views.</li>
+                            </ul>
                     </div>
                     <div>
                         <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**En Route (Day 4):** Your guide will meet you at Arthur's Pass. Look out for the towering rock formations at **Castle Hill**.</li>
                             <li>The lake's intense turquoise color comes from **fine rock-flour** (glacial grindings) suspended in the water.</li>
+                            <li>**Stargazing:** Even without a tour, you can often see the galaxy with the naked eye along the lakefront.</li>
                         </ul>
                     </div>
                 </div>
@@ -542,11 +584,12 @@
             <div id="excursions-MountCook" class="excursion-content" data-excursion-for="MountCook">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 5-6)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Hiking:** Short walks like the Kea Point Track or the longer Hooker Valley Track offer stunning views of Mt Cook (Aoraki).</li>
-                            <li>**Tasman Glacier:** New Zealand's largest glacier. See blue ice and icebergs on the Glacier Explorers Tour.</li>
-                            <li>**Aoraki Mount Cook National Park Visitor Centre:** Offers informative displays about flora, fauna, and Maori heritage.</li>
+                            <li>**Scheduled Activities:** Ultimate Helicopter Flight (Day 5) and Glacier Explorers Tour (Day 6).</li>
+                            <li>**Hiking:** The **Hooker Valley Track** is a famous, relatively flat day walk offering stunning views of Mt Cook and crossing three swing bridges (allow 2-4 hours return).</li>
+                            <li>**Short Walk:** The **Kea Point Track** is a shorter walk (approx. 1 hour return) from the campground to a glacial lake viewpoint.</li>
+                            <li>**Culture:** Visit the **Sir Edmund Hillary Alpine Centre** to learn about the history of climbing and exploration in the Southern Alps.</li>
                         </ul>
                     </div>
                     <div>
@@ -563,12 +606,13 @@
             <div id="excursions-Queenstown" class="excursion-content" data-excursion-for="Queenstown">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 7-9)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Wanaka:** Home of the famous "That Wanaka Tree" and offers great lakeside exploration.</li>
-                            <li>**Cardrona Hotel:** A historic and iconic stop on the Crown Range road.</li>
-                            <li>**Central Otago:** Renowned for Pinot Noir wine; the region is a must-visit for food and wine lovers.</li>
-                            <li>**Arrowtown:** Visit this old gold-mining history town near Queenstown.</li>
+                            <li>**Scheduled Activities:** Walter Peak Gourmet Dinner (Day 7) and Central Otago Wine Tour (Day 8).</li>
+                            <li>**Adventure:** Queenstown is the adventure capital. Consider **Bungy Jumping** (Kawarau Bridge or Nevis), **Skydiving**, or a **Shotover Jet Boat Ride** (optional activities).</li>
+                            <li>**Scenic Views:** Ride the **Skyline Gondola** up Bob's Peak to enjoy the views and ride the **Luge**.</li>
+                            <li>**Relaxation:** Book a session at the scenic **Onsen Hot Pools**.</li>
+                            <li>**Wanaka Excursion (Day 9):** Visit **Arrowtown** for gold-mining history, and see the historic **Cardrona Hotel/Distillery**.</li>
                         </ul>
                     </div>
                     <div>
@@ -576,7 +620,7 @@
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**Crown Range:** One of New Zealand's highest alpine roads—drive carefully and enjoy the views.</li>
                             <li>**Day 8:** Is the mandatory **Guide Rest Day**. Independent activities are scheduled for this day.</li>
-                            <li>**Adventure Capital:** Queenstown offers bungee jumping, jet boating, and skydiving (optional activities).</li>
+                            <li>**Dining Tip:** Grab a famous burger at **Fergburger**.</li>
                         </ul>
                     </div>
                 </div>
@@ -585,12 +629,13 @@
             <div id="excursions-TeAnau" class="excursion-content" data-excursion-for="TeAnau">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 10-11)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Fiordland National Park:** A glacier-carved wilderness and World Heritage Area.</li>
-                            <li>**Milford Road:** Considered one of the world's finest alpine drives with exceptional scenery and short nature walks.</li>
-                            <li>**Ata Whenua - Shadowland:** A recommended film viewing at Fiordland Cinema about the remote national park.</li>
-                            <li>**Local Cuisine:** Try local fare like venison, lobster, and seafood in Te Anau.</li>
+                            <li>**Scheduled Activities:** Te Anau Glowworm Caves Tour (Day 10) and Milford Sound Nature Cruise (Day 11).</li>
+                            <li>**Milford Road:** The drive to Milford Sound is spectacular; plan for multiple photo stops along the way (e.g., Mirror Lakes, Homer Tunnel).</li>
+                            <li>**Hiking:** Experience a taste of a Great Walk by day hiking a section of the **Kepler Track** (e.g., Dock Bay or Brod Bay sections).</li>
+                            <li>**Alternative:** See the highly recommended local film **Ata Whenua - Shadowland** at Fiordland Cinema about the remote national park.</li>
+                            <li>**Adventure:** Consider a **Fiordland Jet Boat** ride on the Waiau River.</li>
                         </ul>
                     </div>
                     <div>
@@ -598,6 +643,7 @@
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**Glowworm Caves:** Note that photography/video are not permitted inside the caves. Temperature is around $12^{\circ}C$.</li>
                             <li>**Milford Sound:** The cruise offers close-up views due to smaller boat size. Look for the massive rock faces and waterfalls.</li>
+                            <li>**Cuisine:** Try local fare like venison, lobster, and seafood in Te Anau.</li>
                         </ul>
                     </div>
                 </div>
@@ -606,12 +652,12 @@
             <div id="excursions-Rotorua" class="excursion-content" data-excursion-for="Rotorua">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 12-13)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Geothermal Activity:** Encounter dramatic geysers (like Põhutu) and bubbling mud pools.</li>
-                            <li>**Wai Ariki Hot Springs:** Experience healing traditions rooted in Ngāti Whakaue culture.</li>
-                            <li>**Redwoods Treewalk:** Enjoy the peace of the 117-year-old Redwood Forest canopy from 20 meters high.</li>
-                            <li>**Māori Cultural Experience (Te Pō):** Includes a traditional Hāngī dinner and viewing the geothermal valley under lights.</li>
+                            <li>**Scheduled Activities:** Redwoods Treewalk, Wai Ariki Hot Springs, and Te Pō Māori Cultural Experience + Hāngī Dinner (Day 13).</li>
+                            <li>**Geothermal Activity:** Visit **Wai-O-Tapu Thermal Wonderland** to see the colorful hot springs and Lady Knox Geyser, or **Te Puia** to see the Põhutu Geyser and bubbling mud pools.</li>
+                            <li>**Adventure:** Try **ZORB Rotorua** (rolling downhill in a giant inflatable ball) or take the **Skyline Gondola and Luge**.</li>
+                            <li>**Culture:** Explore the **Whakarewarewa Living Māori Village** to see geothermal features and culture.</li>
                         </ul>
                     </div>
                     <div>
@@ -628,12 +674,13 @@
             <div id="excursions-Auckland" class="excursion-content" data-excursion-for="Auckland">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Local Highlights (Day 14-16)</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Waiheke Island:** Famous for its wineries, art galleries, and craft boutiques (requires a ferry trip).</li>
-                            <li>**Shopping:** Explore luxury brands on Queen Street or high fashion boutiques on High Street.</li>
-                            <li>**Viaduct Basin / Federal Street:** Premier spots for fine dining and waterfront views.</li>
-                            <li>**Activities:** Opportunities for whale watching or sailing on an America's Cup yacht (independent/optional).</li>
+                            <li>**Day 15 (Independent):** Take a ferry to **Waiheke Island** for wineries and beaches, with optional activities like ziplining or a wine tour.</li>
+                            <li>**City Highlights:** Visit the **Sky Tower** for dining or the SkyWalk/SkyJump.</li>
+                            <li>**Waterfront:** Explore the **Viaduct Harbour** for dining and shopping, or take an **America's Cup sailing experience**.</li>
+                            <li>**Culture:** Visit the **Auckland Museum** for daily Māori cultural performances or the **Auckland Art Gallery**.</li>
+                            <li>**Alternative:** Take a ferry to **Rangitoto Island** and hike to the summit of the volcanic cone.</li>
                         </ul>
                     </div>
                     <div>
