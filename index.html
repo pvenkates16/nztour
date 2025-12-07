@@ -6,7 +6,6 @@
     <title>New Zealand Tour Itinerary</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7fafc; }
@@ -116,7 +115,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- Header & Hero Section -->
     <header class="hero-bg py-24 text-white">
         <div class="container mx-auto px-4 text-center">
             <h1 class="text-5xl font-bold mb-2">Aotearoa: 14-Day New Zealand Tour</h1>
@@ -124,10 +122,8 @@
         </div>
     </header>
 
-    <!-- Main Content Container -->
     <main class="container mx-auto px-4 py-12">
 
-        <!-- Historical Overview Section -->
         <section class="mb-16 p-8 bg-white rounded-xl shadow-lg border-t-4 border-cyan-500">
             <h2 class="text-3xl font-bold mb-4 text-gray-800">Aotearoa: History of Settlement</h2>
             <p class="text-gray-600 mb-6">
@@ -150,12 +146,9 @@
             </div>
         </section>
 
-        <!-- The Route Map & Overview Section has been removed as requested. -->
-        <!-- Start of Day-by-Day Itinerary -->
         <section class="mb-16">
             <h2 class="text-3xl font-bold mb-8 text-gray-800">Day-by-Day Tour Itinerary</h2>
 
-            <!-- Tab Navigation -->
             <div id="tab-nav" class="flex flex-wrap border-b border-gray-200 -mb-px">
                 <button data-tab-target="Christchurch" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Christchurch (3 Nights)</button>
                 <button data-tab-target="LakeTekapo" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Lake Tekapo (1 Night)</button>
@@ -166,10 +159,8 @@
                 <button data-tab-target="Auckland" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Auckland (2 Nights)</button>
             </div>
 
-            <!-- Tab Content Container -->
             <div id="tab-content" class="p-6 bg-white rounded-b-xl shadow-xl border-t-2 border-gray-200">
                 
-                <!-- 1. Christchurch Content -->
                 <div data-tab-content="Christchurch" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Sudima+Chch" alt="Sudima Christchurch City exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
@@ -219,7 +210,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Lake Tekapo Content -->
                 <div data-tab-content="LakeTekapo" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Grand+Suites+Tekapo" alt="Grand Suites Lake Tekapo exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
@@ -260,7 +250,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Mount Cook Village Content -->
                 <div data-tab-content="MountCook" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Hermitage+Mt+Cook" alt="The Hermitage Hotel Mount Cook exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
@@ -308,14 +297,13 @@
                     </div>
                 </div>
 
-                <!-- 4. Queenstown Content -->
                 <div data-tab-content="Queenstown" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Central+Private+Qt" alt="The Central Private Hotel exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: The Central Private Hotel by Naumi Hotels</h4>
                             <p class="text-sm text-gray-600 mb-2">4 Sydney Street, Queenstown. Includes daily breakfast and complimentary happy hour (5-6pm).</p>
-                            <a href="#central-private-hotel" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Central Private Hotel →</a>
+                            <a href="https://www.naumihotels.com/the-central-hotel-queenstown-a-naumi-chapter" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View The Central Private Hotel →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -364,14 +352,13 @@
                     </div>
                 </div>
 
-                <!-- 5. Te Anau Content -->
                 <div data-tab-content="TeAnau" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Fiordland+Motel+Te+Anau" alt="Fiordland Lakeview Motel exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Fiordland Lakeview Motel & Apartments</h4>
                             <p class="text-sm text-gray-600 mb-2">42 Lakefront Drive, Te Anau. Breakfast booked at Distinction Te Anau Hotel & Villas.</p>
-                            <a href="#fiordland-lakeview-motel" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Fiordland Lakeview Motel →</a>
+                            <a href="https://fiordlandlakeview.co.nz/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Fiordland Lakeview Motel →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -412,14 +399,13 @@
                     </div>
                 </div>
 
-                <!-- 6. Rotorua Content -->
                 <div data-tab-content="Rotorua" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Pullman+Rotorua" alt="Pullman Hotel Rotorua exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Pullman Hotel Rotorua</h4>
                             <p class="text-sm text-gray-600 mb-2">1135 Arawa Street, Rotorua. A contemporary hotel in the heart of the city.</p>
-                            <a href="#pullman-rotorua" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Pullman Hotel Rotorua →</a>
+                            <a href="https://www.pullmanrotorua.com/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Pullman Hotel Rotorua →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -460,14 +446,13 @@
                     </div>
                 </div>
 
-                <!-- 7. Auckland Content -->
                 <div data-tab-content="Auckland" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
                         <img src="https://placehold.co/200x100/38bdf8/ffffff?text=Horizon+SkyCity+Akl" alt="Horizon by SkyCity exterior" class="w-full md:w-48 h-auto md:h-24 object-cover rounded-md shadow-md">
                         <div>
                             <h4 class="font-semibold text-lg text-gray-800">Accommodation: Horizon by SkyCity</h4>
                             <p class="text-sm text-gray-600 mb-2">85 Hobson Street, Auckland. Located near the iconic Sky Tower.</p>
-                            <a href="#horizon-skycity" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Horizon by SkyCity →</a>
+                            <a href="https://horizonbyskycity.skycityauckland.co.nz/" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-150">View Horizon by SkyCity →</a>
                         </div>
                     </div>
                     <div class="space-y-8">
@@ -512,11 +497,9 @@
             </div>
         </section>
 
-        <!-- Dynamic Excursions & Notes Section -->
         <section id="dynamic-excursions-container" class="mb-12 p-8 bg-blue-50 rounded-xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">Local Excursions & Notes</h2>
             
-            <!-- Default content (or hidden content for each tab) -->
             <div id="excursions-Christchurch" class="excursion-content" data-excursion-for="Christchurch">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
@@ -668,9 +651,7 @@
 
     </main>
 
-    <!-- Chatbot Container - Chatbase Integration -->
     <div id="chatbot-wrapper">
-        <!-- Chat Window (Collapsible Container for the iframe) -->
         <div id="chat-window" class="">
             <iframe
                 src="https://www.chatbase.co/chatbot-iframe/Fbt7luegVnFml1NzyNUol"
@@ -680,13 +661,11 @@
                 allowfullscreen
             ></iframe>
         </div>
-        <!-- Toggle Button -->
         <button id="chat-toggle-btn" class="absolute bottom-0 right-0">
             <i class="fas fa-comment text-xl"></i>
         </button>
     </div>
 
-    <!-- JavaScript for Tab Functionality & Chatbot -->
     <script>
         // --- Tab Functionality ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -766,7 +745,6 @@
         });
     </script>
 
-    <!-- Footer -->
     <footer class="bg-gray-800 text-white py-6 mt-12">
         <div class="container mx-auto px-4 text-center text-sm">
             <p>&copy; 2025 New Zealand Guided Tours | Prepared for Kumar Rajan Group</p>
