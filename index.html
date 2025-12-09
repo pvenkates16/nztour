@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Zealand Tour Itinerary</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -166,24 +167,24 @@
             position: relative; /* SVG needed for z-index */
             z-index: 1;
         }
+        /* Removed transform/size-changing hover to ensure stability on click interaction */
         .stay-point, .transit-line, .excursion-line, .excursion-point, .flight-line {
             transition: all 0.2s ease-in-out; 
+            cursor: pointer;
         }
         
         .stay-point {
             fill: #dc2626; /* Red */
             stroke: #991b1b;
             stroke-width: 2;
-            cursor: pointer;
         }
         .stay-point:hover {
-            filter: brightness(1.2); /* Subtle visual hint without jumping */
+            filter: brightness(1.2); 
         }
         .transit-line {
             stroke: #2563eb; /* Blue */
             stroke-width: 3;
             fill: none;
-            cursor: pointer;
         }
         .transit-line:hover {
             filter: brightness(1.2);
@@ -192,7 +193,6 @@
             stroke: #10b981; /* Green */
             stroke-width: 2;
             fill: none;
-            cursor: pointer;
             stroke-dasharray: 4 2;
         }
         .excursion-line:hover {
@@ -202,7 +202,6 @@
             fill: #059669; /* Darker Green */
             stroke: #10b981;
             stroke-width: 2;
-            cursor: pointer;
         }
         .excursion-point:hover {
             filter: brightness(1.2);
@@ -212,7 +211,6 @@
             stroke-width: 4;
             fill: none;
             stroke-dasharray: 8 4;
-            cursor: pointer;
         }
         .flight-line:hover {
             filter: brightness(1.2);
@@ -224,7 +222,8 @@
             top: 20px;
             right: 20px;
             width: 280px;
-            background-color: rgba(255, 255, 255, 0.95);
+            /* DECREASED OPACITY TO 0.85 to show more of the background THREE.js spheres */
+            background-color: rgba(255, 255, 255, 0.85); 
             border: 2px solid #0e7490;
             border-radius: 0.5rem;
             padding: 1rem;
@@ -889,7 +888,8 @@
             metalness: 1.0,           
             roughness: 0.05,          // Reduced to make it more mirror-like/silvery
             transparent: true,        
-            opacity: 0.7,             
+            // DECREASED OPACITY to allow more of the background to show through
+            opacity: 0.55, 
             transmission: 0.9,        
             ior: 1.5,                 
             thickness: 0.5,           
@@ -997,7 +997,7 @@
             { id: 'E11', type: 'Excursion', assocStay: 'S6', city: 'Hāngī Dinner', day: 'Day 13', coord: { x: 600, y: 300 }, info: 'Excursion: Te Pō Māori Cultural Experience + Hāngī Dinner (5:30 PM - 8:15 PM). Includes Hāngī buffet and cultural performance.', class: 'excursion-line' },
         ];
 
-        // --- Map Drawing and Interactivity ---
+        // --- Map Drawing and Interactivity (REFACTORED TO D3.js) ---
         
         function updateInfoPanel(title, htmlContent) {
             const panel = document.getElementById('info-panel');
@@ -1007,151 +1007,146 @@
             content.innerHTML = htmlContent;
         }
 
-        function generateSchematicMap() {
-            const svgContainer = document.getElementById('map-svg-container');
+        function generateD3Map() {
+            const svgContainer = d3.select("#map-svg-container");
             
             // 1. CLEAR: Remove only the previous SVG element if it exists
-            let existingSvg = document.getElementById('map-svg');
-            if (existingSvg) {
-                existingSvg.remove();
-            }
-            
-            const svgNS = "http://www.w3.org/2000/svg";
+            svgContainer.select("#map-svg").remove();
             
             // 2. Create SVG element and append it (it will render behind the info-panel due to z-index)
-            const svg = document.createElementNS(svgNS, 'svg');
-            svg.setAttribute('id', 'map-svg');
-            svg.setAttribute('viewBox', '0 0 800 700'); 
-            svgContainer.appendChild(svg);
+            const svg = svgContainer.append("svg")
+                .attr("id", "map-svg")
+                .attr("viewBox", "0 0 800 700"); 
             
-            // Helper function to attach click event
-            function attachClickEvents(element, title, infoHtml) {
-                element.addEventListener('click', () => {
-                    updateInfoPanel(title, infoHtml);
-                });
-            }
+            // Helper function to fetch the full stay object
+            const getStayObject = (id) => mapData.find(d => d.id === id && d.type === 'Stay');
 
-            // 3. Filter map data and helper function
+            // 3. Filter data
             const stays = mapData.filter(d => d.type === 'Stay');
             const transits = mapData.filter(d => d.type === 'Transit');
             const excursions = mapData.filter(d => d.type === 'Excursion');
             
-            // FIX: Helper returns the whole stay object
-            const getStayObject = (id) => stays.find(s => s.id === id);
+            // Helper function to attach click event (D3 binding)
+            const attachClickEvents = (selection, d) => {
+                let title, infoHtml;
+
+                if (d.type === 'Stay') {
+                    title = `${d.city} Stay`;
+                    infoHtml = `<p>${d.info}</p>`;
+                } else if (d.type === 'Transit') {
+                    const startStay = getStayObject(d.from);
+                    const endStay = getStayObject(d.to);
+                    title = `${d.day}: ${d.isFlight ? 'Domestic Flight' : 'Transit'}`;
+                    infoHtml = `<p><strong>Route:</strong> ${startStay.label} to ${endStay.label}</p><p>${d.info}</p>`;
+                } else if (d.type === 'Excursion') {
+                    title = `${d.day}: ${d.city}`;
+                    infoHtml = `<p>${d.info}</p>`;
+                }
+
+                selection.on('click', () => {
+                    updateInfoPanel(title, infoHtml);
+                });
+            };
 
             // 4. Draw Transits (Lines/Paths)
-            transits.forEach(t => {
-                // Fetch full objects to access both label and coord
-                const startStay = getStayObject(t.from); 
-                const endStay = getStayObject(t.to);     
+            svg.selectAll(".transit-element")
+                .data(transits)
+                .enter()
+                .each(function(d) {
+                    const startStay = getStayObject(d.from); 
+                    const endStay = getStayObject(d.to);     
 
-                // Check if stays were found to prevent errors
-                if (!startStay || !endStay) {
-                    console.error(`Missing stay data for transit ${t.id}: From ${t.from} to ${t.to}`);
-                    return; 
-                }
+                    if (!startStay || !endStay) return; 
 
-                const startCoord = startStay.coord; 
-                const endCoord = endStay.coord;     
-                
-                let element;
-                const title = `${t.day}: ${t.isFlight ? 'Domestic Flight' : 'Transit'}`;
-                // FIX: Accessing the .label property from the fetched stay objects
-                const infoHtml = `<p><strong>Route:</strong> ${startStay.label} to ${endStay.label}</p><p>${t.info}</p>`;
+                    const startCoord = startStay.coord; 
+                    const endCoord = endStay.coord;     
+                    
+                    let element;
 
-                if (t.isFlight) {
-                    element = document.createElementNS(svgNS, 'path');
-                    const c1x = (startCoord.x + endCoord.x) / 2 - 200;
-                    const c1y = (startCoord.y + endCoord.y) / 2 + 100;
-                    element.setAttribute('d', `M${startCoord.x} ${startCoord.y} C ${c1x} ${c1y}, ${c1x+400} ${c1y}, ${endCoord.x} ${endCoord.y}`);
-                    element.setAttribute('class', 'flight-line');
-                } else {
-                    element = document.createElementNS(svgNS, 'line');
-                    element.setAttribute('x1', startCoord.x);
-                    element.setAttribute('y1', startCoord.y);
-                    element.setAttribute('x2', endCoord.x);
-                    element.setAttribute('y2', endCoord.y);
-                    element.setAttribute('class', 'transit-line');
-                }
-                
-                attachClickEvents(element, title, infoHtml);
-                svg.appendChild(element);
-            });
-
-            // 5. Draw Excursions (Points & Lines)
-            excursions.forEach(e => {
-                const stayObject = getStayObject(e.assocStay);
-                const stayCoord = stayObject ? stayObject.coord : { x: 0, y: 0 }; // Default if missing, though it shouldn't be
-
-                // Line from Stay Point to Excursion Point
-                const line = document.createElementNS(svgNS, 'line');
-                line.setAttribute('x1', stayCoord.x);
-                line.setAttribute('y1', stayCoord.y);
-                line.setAttribute('x2', e.coord.x);
-                line.setAttribute('y2', e.coord.y);
-                line.setAttribute('class', 'excursion-line');
-                svg.appendChild(line);
-
-                // Excursion Point (Small Circle)
-                const point = document.createElementNS(svgNS, 'circle');
-                point.setAttribute('cx', e.coord.x);
-                point.setAttribute('cy', e.coord.y);
-                point.setAttribute('r', 8);
-                point.setAttribute('class', 'excursion-point');
-                
-                const title = `${e.day}: ${e.city}`;
-                const infoHtml = `<p>${e.info}</p>`;
-                
-                // Attach click events to both the point and the line
-                [point, line].forEach(el => {
-                    attachClickEvents(el, title, infoHtml);
+                    if (d.isFlight) {
+                        // Create curved path for Queenstown to Rotorua flight
+                        element = d3.select(this).append("path")
+                            .attr("class", "flight-line");
+                        const c1x = (startCoord.x + endCoord.x) / 2 - 200;
+                        const c1y = (startCoord.y + endCoord.y) / 2 + 100;
+                        element.attr('d', `M${startCoord.x} ${startCoord.y} C ${c1x} ${c1y}, ${c1x+400} ${c1y}, ${endCoord.x} ${endCoord.y}`);
+                    } else {
+                        // Straight line for road/rail travel
+                        element = d3.select(this).append("line")
+                            .attr("class", "transit-line")
+                            .attr('x1', startCoord.x)
+                            .attr('y1', startCoord.y)
+                            .attr('x2', endCoord.x)
+                            .attr('y2', endCoord.y);
+                    }
+                    
+                    attachClickEvents(element, d);
                 });
 
-                svg.appendChild(point);
+            // 5. Draw Excursions (Points & Lines)
+            svg.selectAll(".excursion-element")
+                .data(excursions)
+                .enter()
+                .each(function(d) {
+                    const stayObject = getStayObject(d.assocStay);
+                    if (!stayObject) return;
+                    const stayCoord = stayObject.coord;
 
-                // Add text label for the excursion
-                const text = document.createElementNS(svgNS, 'text');
-                text.setAttribute('x', e.coord.x);
-                text.setAttribute('y', e.coord.y + 15);
-                text.setAttribute('font-size', '14');
-                text.setAttribute('fill', '#059669');
-                text.setAttribute('text-anchor', 'middle');
-                text.textContent = e.city;
-                svg.appendChild(text);
-                attachClickEvents(text, title, infoHtml); // Also make text clickable
-            });
+                    // Line from Stay Point to Excursion Point
+                    const line = d3.select(this).append("line")
+                        .attr("class", "excursion-line")
+                        .attr('x1', stayCoord.x)
+                        .attr('y1', stayCoord.y)
+                        .attr('x2', d.coord.x)
+                        .attr('y2', d.coord.y);
+                    attachClickEvents(line, d);
+
+                    // Excursion Point (Small Circle)
+                    const point = d3.select(this).append("circle")
+                        .attr("class", "excursion-point")
+                        .attr('cx', d.coord.x)
+                        .attr('cy', d.coord.y)
+                        .attr('r', 8);
+                    attachClickEvents(point, d);
+
+                    // Add text label for the excursion
+                    const text = d3.select(this).append("text")
+                        .attr('x', d.coord.x)
+                        .attr('y', d.coord.y + 15)
+                        .attr('font-size', '14')
+                        .attr('fill', '#059669')
+                        .attr('text-anchor', 'middle')
+                        .text(d.city);
+                    attachClickEvents(text, d);
+                });
 
             // 6. Draw Stays (Red Circles)
-            stays.forEach(s => {
-                const circle = document.createElementNS(svgNS, 'circle');
-                circle.setAttribute('cx', s.coord.x);
-                circle.setAttribute('cy', s.coord.y);
-                circle.setAttribute('r', 12);
-                circle.setAttribute('class', 'stay-point');
+            svg.selectAll(".stay-label")
+                .data(stays)
+                .enter()
+                .each(function(d) {
+                    const circle = d3.select(this).append("circle")
+                        .attr("class", "stay-point")
+                        .attr('cx', d.coord.x)
+                        .attr('cy', d.coord.y)
+                        .attr('r', 12);
+                    attachClickEvents(circle, d);
 
-                const title = `${s.city} Stay`;
-                const infoHtml = `<p>${s.info}</p>`;
+                    const text = d3.select(this).append("text")
+                        .attr('x', d.coord.x)
+                        .attr('y', d.coord.y - 15)
+                        .attr('font-size', '16')
+                        .attr('font-weight', 'bold')
+                        .attr('fill', '#dc2626')
+                        .attr('text-anchor', 'middle')
+                        .text(d.label);
+                    attachClickEvents(text, d);
                 
-                attachClickEvents(circle, title, infoHtml);
-                svg.appendChild(circle);
-
-                // Add text label for the stay
-                const text = document.createElementNS(svgNS, 'text');
-                text.setAttribute('x', s.coord.x);
-                text.setAttribute('y', s.coord.y - 15);
-                text.setAttribute('font-size', '16');
-                text.setAttribute('font-weight', 'bold');
-                text.setAttribute('fill', '#dc2626');
-                text.setAttribute('text-anchor', 'middle');
-                text.textContent = s.label;
-                svg.appendChild(text);
-                attachClickEvents(text, title, infoHtml); // Also make text clickable
-                
-                // 7. Set default info panel to Christchurch (S1)
-                if (s.id === 'S1') {
-                     updateInfoPanel(title, infoHtml);
-                }
-            });
+                    // 7. Set default info panel to Christchurch (S1)
+                    if (d.id === 'S1') {
+                         updateInfoPanel(`${d.city} Stay`, `<p>${d.info}</p>`);
+                    }
+                });
         }
 
         // --- Tab Functionality ---
@@ -1199,8 +1194,9 @@
                 }
                 
                 // 7. Generate map if TourMap is selected and it hasn't been generated yet
+                // Use generateD3Map() now
                 if (targetId === "TourMap" && !mapGenerated) {
-                    generateSchematicMap();
+                    generateD3Map();
                     mapGenerated = true;
                 }
             }
