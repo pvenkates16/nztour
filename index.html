@@ -122,7 +122,8 @@
             transform: translateY(10px);
             opacity: 0;
             pointer-events: none; /* Invisible when closed */
-            margin-bottom: 10px; /* Space above toggle button */
+            /* FIX: Increased margin to provide clearance for the chat input/send button */
+            margin-bottom: 50px; 
         }
         #chat-window.open {
             transform: translateY(0);
@@ -178,7 +179,7 @@
             stroke-width: 2;
         }
         .stay-point:hover {
-            filter: brightness(1.2); /* Subtle visual hint without jumping */
+            filter: brightness(1.2); 
         }
         .transit-line {
             stroke: #2563eb; /* Blue */
@@ -429,7 +430,7 @@
                             <h3 class="text-xl font-bold text-cyan-700">Mount Cook Village, Aoraki/Mt Cook</h3>
                             <p class="text-sm text-gray-500 mb-4">Days 5-6</p>
                             <ul class="list-none space-y-3 text-gray-700">
-                                <li><span class="font-semibold">Day 5 (Alpine Views):</span> Scenic drive past Lake Pukaki. Afternoon: <span class="text-blue-600">Aoraki/Mt Cook Ultimate Helicopter Flight.</span> circling the summit and including a snow landing on Tasman Glacier.</li>
+                                <li><span class="font-semibold">Day 5 (Alpine Views):</span> Scenic drive past Lake Pukaki. Afternoon: <span class="text-blue-600">Aoraki/Mt Cook Ultimate Helicopter Flight</span>, circling the summit and including a snow landing on Tasman Glacier.</li>
                                 <li><span class="font-semibold">Day 6 (Glacier Exploration):</span> Morning: <span class="text-blue-600">Glacier Explorers Tour.</span> Boat trip on the Tasman Glacial Lake to see icebergs (Note: Requires a 1.5km walk). Afternoon free for short, well-marked walks (e.g., Kea Point, Red Tarns).</li>
                             </ul>
                         </div>
@@ -1069,7 +1070,7 @@
                 let title, infoHtml;
 
                 if (d.type === 'Stay') {
-                    // MODIFIED: Include Day numbers in title and body
+                    // UPDATED: Include Day numbers in title and body
                     title = `${d.city} Stay (${d.day})`;
                     infoHtml = `<p><strong>Days of Stay:</strong> ${d.day}</p><p>${d.info}</p>`;
                 } else if (d.type === 'Transit') {
@@ -1198,7 +1199,7 @@
                 
                 // 8. Set default info panel to Christchurch (S1)
                 if (s.id === 'S1') {
-                     // MODIFIED: Set default info with Day numbers
+                     // UPDATED: Set default info with Day numbers
                      const defaultTitle = `${s.city} Stay (${s.day})`;
                      const defaultInfoHtml = `<p><strong>Days of Stay:</strong> ${s.day}</p><p>${s.info}</p>`;
                      updateInfoPanel(defaultTitle, defaultInfoHtml);
