@@ -80,8 +80,8 @@
             background-color: #0e7490; /* Darker teal dot */
             border: 3px solid #f7fafc;
         }
-        .excursion-content:not([data-excursion-for="Christchurch"]) {
-            display: none; /* Hide all excursion content except Christchurch by default (JS will manage visibility) */
+        .excursion-content:not([data-excursion-for="Overview"]) {
+            display: none; /* Hide all excursion content except Overview by default (JS will manage visibility) */
         }
         .meal-status {
             font-weight: 600;
@@ -151,12 +151,100 @@
             cursor: pointer;
         }
 
-        /* Map Container Style for Positioning */
-        .map-container {
+        /* --- MAP SPECIFIC STYLES --- */
+        #map-svg-container {
+            position: relative;
             border-radius: 1rem;
             overflow: hidden;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            height: 700px;
+            background-color: #e0f2fe;
         }
+        #map-svg {
+            width: 100%;
+            height: 100%;
+            position: relative; /* SVG needed for z-index */
+            z-index: 1;
+        }
+        .stay-point, .transit-line, .excursion-line, .excursion-point, .flight-line {
+            transition: all 0.2s ease-in-out; /* Enable smooth transitions for hover */
+        }
+        
+        .stay-point {
+            fill: #dc2626; /* Red */
+            stroke: #991b1b;
+            stroke-width: 2;
+            cursor: pointer;
+        }
+        .stay-point:hover {
+            transform: scale(1.3);
+        }
+        .transit-line {
+            stroke: #2563eb; /* Blue */
+            stroke-width: 3;
+            fill: none;
+            cursor: pointer;
+        }
+        .transit-line:hover {
+            stroke-width: 5;
+        }
+        .excursion-line {
+            stroke: #10b981; /* Green */
+            stroke-width: 2;
+            fill: none;
+            cursor: pointer;
+            stroke-dasharray: 4 2;
+        }
+        .excursion-line:hover {
+             stroke-width: 3;
+        }
+        .excursion-point {
+            fill: #059669; /* Darker Green */
+            stroke: #10b981;
+            stroke-width: 2;
+            cursor: pointer;
+        }
+        .excursion-point:hover {
+            transform: scale(1.4);
+        }
+        .flight-line {
+            stroke: #6b7280; /* Grey */
+            stroke-width: 4;
+            fill: none;
+            stroke-dasharray: 8 4;
+            cursor: pointer;
+        }
+        .flight-line:hover {
+            stroke-width: 6;
+        }
+
+        /* --- INFO PANEL STYLES --- */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 280px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #0e7490;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10; /* Above the SVG */
+            font-size: 0.875rem;
+            line-height: 1.4;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        #info-panel h4 {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #0e7490;
+            margin-bottom: 0.5rem;
+        }
+        #info-panel p {
+            color: #1f2937;
+        }
+
     </style>
 </head>
 <body class="antialiased">
@@ -172,32 +260,12 @@
 
     <main class="container mx-auto px-4 py-12">
 
-        <section class="mb-16 p-8 content-card-bg rounded-xl shadow-lg border-t-4 border-cyan-500">
-            <h2 class="text-3xl font-bold mb-4 text-gray-800">Aotearoa: History of Settlement</h2>
-            <p class="text-gray-600 mb-6">
-                New Zealand (Aotearoa) and Australia have distinct settlement histories. New Zealand was one of the last habitable lands to be settled by humans, with Polynesians (who developed into the Māori culture) arriving in ocean-going canoes (`waka`) between **1250 and 1300 CE**. The discovery was a planned and deliberate event that occurred over several decades.
-            </p>
-            <p class="text-gray-600 mb-6">
-                In contrast, Australia's Indigenous history stretches back much further, with Aboriginal Australians arriving from Indonesia or New Guinea around **50,000 to 65,000 years ago**.
-            </p>
-            <h3 class="text-xl font-semibold mb-3 text-gray-700">A Tale of Two Colonies: NZ vs. Australia</h3>
-            <div class="space-y-3 text-gray-600">
-                <p>
-                    <span class="font-medium text-cyan-600">Indigenous History:</span> Māori were agriculturalists with strong warrior traditions, capable of organized resistance. (<a href="https://teara.govt.nz/en/maori#:~:text=Early%20settlement,and%20strong%20traditions%20of%20warfare." target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about Māori history</a>). Aboriginal Australians were primarily hunter-gatherers.
-                </p>
-                <p>
-                    <span class="font-medium text-cyan-600">Colonial Foundation:</span> Australia was founded in 1788 as a penal colony (New South Wales), based on the legal concept of *Terra Nullius* (land belonging to no one). New Zealand's foundation was dramatically different, secured in 1840 through the **Treaty of Waitangi** (`Te Tiriti o Waitangi`) between the British Crown and Māori chiefs, guaranteeing certain rights in exchange for sovereignty. (<a href="https://teara.govt.nz/en/historic-places/page-1" target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about historic colonial places</a>).
-                </p>
-                <p>
-                    <span class="font-medium text-cyan-600">Settler Class:</span> Early Australian settlers included large numbers of lower-class immigrants and convicts. New Zealand tended to attract a different class of settler, often associated with commercially organized settlement companies and more middle-class religious groups.
-                </p>
-            </div>
-        </section>
-
         <section class="mb-16">
-            <h2 class="text-3xl font-bold mb-8 text-gray-800">Day-by-Day Tour Itinerary</h2>
+            <h2 class="text-3xl font-bold mb-8 text-gray-800">Tour Details & Day-by-Day Itinerary</h2>
 
             <div id="tab-nav" class="flex flex-wrap border-b border-gray-200 -mb-px content-card-bg">
+                <button data-tab-target="Overview" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Tour Overview</button>
+                <button data-tab-target="TourMap" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Tour Map</button>
                 <button data-tab-target="Christchurch" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Christchurch (3 Nights)</button>
                 <button data-tab-target="LakeTekapo" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Lake Tekapo (1 Night)</button>
                 <button data-tab-target="MountCook" class="tab-button inline-block p-4 border-b-2 border-transparent rounded-t-lg text-gray-500 hover:text-cyan-600 hover:border-cyan-300 transition duration-150 text-sm md:text-base">Mt Cook (2 Nights)</button>
@@ -208,6 +276,42 @@
             </div>
 
             <div id="tab-content" class="p-6 content-card-bg rounded-b-xl shadow-xl border-t-2 border-gray-200">
+                
+                <div data-tab-content="Overview" class="tab-content hidden">
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h2 class="text-3xl font-bold mb-4 text-gray-800">Aotearoa: History of Settlement</h2>
+                        <p class="text-gray-600 mb-6">
+                            New Zealand (Aotearoa) and Australia have distinct settlement histories. New Zealand was one of the last habitable lands to be settled by humans, with Polynesians (who developed into the Māori culture) arriving in ocean-going canoes (`waka`) between **1250 and 1300 CE**. The discovery was a planned and deliberate event that occurred over several decades.
+                        </p>
+                        <p class="text-gray-600 mb-6">
+                            In contrast, Australia's Indigenous history stretches back much further, with Aboriginal Australians arriving from Indonesia or New Guinea around **50,000 to 65,000 years ago**.
+                        </p>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-700">A Tale of Two Colonies: NZ vs. Australia</h3>
+                        <div class="space-y-3 text-gray-600">
+                            <p>
+                                <span class="font-medium text-cyan-600">Indigenous History:</span> Māori were agriculturalists with strong warrior traditions, capable of organized resistance. (<a href="https://teara.govt.nz/en/maori#:~:text=Early%20settlement,and%20strong%20traditions%20of%20warfare." target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about Māori history</a>). Aboriginal Australians were primarily hunter-gatherers.
+                            </p>
+                            <p>
+                                <span class="font-medium text-cyan-600">Colonial Foundation:</span> Australia was founded in 1788 as a penal colony (New South Wales), based on the legal concept of *Terra Nullius* (land belonging to no one). New Zealand's foundation was dramatically different, secured in 1840 through the **Treaty of Waitangi** (`Te Tiriti o Waitangi`) between the British Crown and Māori chiefs, guaranteeing certain rights in exchange for sovereignty. (<a href="https://teara.govt.nz/en/historic-places/page-1" target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about historic colonial places</a>).
+                            </p>
+                            <p>
+                                <span class="font-medium text-cyan-600">Settler Class:</span> Early Australian settlers included large numbers of lower-class immigrants and convicts. New Zealand tended to attract a different class of settler, often associated with commercially organized settlement companies and more middle-class religious groups.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-tab-content="TourMap" class="tab-content hidden">
+                    <h2 class="text-3xl font-bold mb-4 text-gray-800">Visualizing the 14-Day Journey</h2>
+                    <p class="text-gray-600 mb-6">Click on any **Red Circle (Stay)**, **Blue Line (Transit)**, or **Green Element (Excursion)** to view details in the panel below.</p>
+                    
+                    <div id="map-svg-container" class="map-container">
+                        <div id="info-panel">
+                            <h4>Tour Information</h4>
+                            <p id="info-content">Click an element on the map to see details about the stay, transit, or excursion.</p>
+                        </div>
+                        </div>
+                </div>
                 
                 <div data-tab-content="Christchurch" class="tab-content hidden">
                     <div class="mb-4 p-4 bg-gray-50 rounded-lg flex flex-col md:flex-row items-start space-y-3 md:space-y-0 md:space-x-4 border border-gray-200">
@@ -548,6 +652,10 @@
         <section id="dynamic-excursions-container" class="mb-12 p-8 bg-blue-50 content-card-bg rounded-xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">Local Excursions & Notes</h2>
             
+            <div id="excursions-Overview" class="excursion-content" data-excursion-for="Overview">
+                <p class="text-gray-700 italic">No specific daily notes for the Tour Overview. Please select a city tab above to view local highlights and commentary.</p>
+            </div>
+
             <div id="excursions-Christchurch" class="excursion-content" data-excursion-for="Christchurch">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                     <div>
@@ -560,11 +668,12 @@
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**TranzAlpine Journey (Day 4 start):** Considered one of the world's great train journeys, crossing the Southern Alps.</li>
-                            <li>**Woodend & Amberley:** Scenic surf beaches passed on the drive north to Kaikoura (Day 3).</li>
-                            <li>**Kaikoura Excursion:** Look for marine life besides whales (fur seals, dolphins, albatross) and try local seafood delicacies like crayfish.</li>
+                            <li>**Ōtautahi (Christchurch):** The Māori name for Christchurch means "the place of the altar" and refers to a settlement on the Avon River. It is the principal city of the **Ngāi Tahu** iwi (tribe).</li>
+                            <li>**Cathedral City:** Christchurch was settled by the Canterbury Association in 1850 and is known as the "Most English" of New Zealand's cities due to its Gothic architecture and tradition.</li>
+                            <li>**Kaikoura:** The name means "to eat crayfish" (`kai` - food/eat, `koura` - crayfish), reflecting its strong marine harvest traditions.</li>
                         </ul>
                     </div>
                 </div>
@@ -577,16 +686,17 @@
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**Scheduled Activity:** Summit Experience Stargazing Tour (Evening).</li>
                             <li>**Daytime:** Visit the iconic **Church of the Good Shepherd** and the **Mackenzie Sheep Dog Statue**.</li>
-                            <li>**Alternative:** Relax at **Tekapo Springs** (hot pools/spa) or hike the **Mount John Summit Track** for panoramic views.</li>
+                            <li>**Alternative:** Relax at **Tekapo Springs** (hot pools/spa) or hike the **Mount Tahn Summit Track** for panoramic views.</li>
                             <li>**Dark Sky:** The area is part of the Aoraki Mackenzie International Dark Sky Reserve, offering unparalleled night sky views.</li>
                             </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
                             <li>**En Route (Day 4):** Your guide will meet you at Arthur's Pass. Look out for the towering rock formations at **Castle Hill**.</li>
+                            <li>**Mackenzie Country:** The region is named after Scottish shepherd **James Mackenzie**, an outlaw known for brilliant sheep rustling in the 1850s.</li>
                             <li>The lake's intense turquoise color comes from **fine rock-flour** (glacial grindings) suspended in the water.</li>
-                            <li>**Stargazing:** Even without a tour, you can often see the galaxy with the naked eye along the lakefront.</li>
+                            <li>**Stargazing:** The area is celebrated globally as one of the world's best places to view the Milky Way and the Magellanic Clouds, due to its protected dark skies.</li>
                         </ul>
                     </div>
                 </div>
@@ -604,10 +714,11 @@
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Aoraki:** At 3,724 meters, it is New Zealand's highest mountain.</li>
-                            <li>**Wildlife:** Keep an eye out for the cheeky **Kea** (mountain parrots).</li>
+                            <li>**Aoraki/Mt Cook:** The mountain has a dual name. **Aoraki** is the Māori name, meaning "Cloud Piercer," and holds deep mythological significance as an ancestor of the Ngāi Tahu tribe.</li>
+                            <li>**Climbing History:** Sir Edmund Hillary, one of the first two men to climb Mount Everest, trained extensively on Aoraki, highlighting New Zealand's role in global mountaineering history.</li>
+                            <li>**Wildlife:** Keep an eye out for the cheeky **Kea** (mountain parrots), the only alpine parrot in the world.</li>
                             <li>**Important:** The Glacier Explorers Tour involves a 1.5 km walk (20 minutes) to reach the boat launch site.</li>
                         </ul>
                     </div>
@@ -627,11 +738,12 @@
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
+                            <li>**Wakatipu Basin:** Māori legends describe the lake's unusual rhythmic rise and fall (a seiche) as the breathing of a giant sleeping giant, *Matau*.</li>
                             <li>**Crown Range:** One of New Zealand's highest alpine roads—drive carefully and enjoy the views.</li>
+                            <li>**Gold Rush History:** Arrowtown was the heart of the 1860s Central Otago gold rush, attracting thousands of prospectors, including many Chinese miners whose restored settlement remains today.</li>
                             <li>**Day 8:** Is the mandatory **Guide Rest Day**. Independent activities are scheduled for this day.</li>
-                            <li>**Dining Tip:** Grab a famous burger at **Fergburger**.</li>
                         </ul>
                     </div>
                 </div>
@@ -646,14 +758,14 @@
                             <li>**Milford Road:** The drive to Milford Sound is spectacular; plan for multiple photo stops along the way (e.g., Mirror Lakes, Homer Tunnel).</li>
                             <li>**Hiking:** Experience a taste of a Great Walk by day hiking a section of the **Kepler Track** (e.g., Dock Bay or Brod Bay sections).</li>
                             <li>**Alternative:** See the highly recommended local film **Ata Whenua - Shadowland** at Fiordland Cinema about the remote national park.</li>
-                            <li>**Adventure:** Consider a **Fiordland Jet Boat** ride on the Waiau River.</li>
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
+                            <li>**Fiordland National Park:** This is a UNESCO World Heritage Area, recognized for its dramatic glacier-carved fiords, temperate rainforests, and unique wildlife.</li>
                             <li>**Glowworm Caves:** Note that photography/video are not permitted inside the caves. Temperature is around $12^{\circ}C$.</li>
-                            <li>**Milford Sound:** The cruise offers close-up views due to smaller boat size. Look for the massive rock faces and waterfalls.</li>
+                            <li>**Milford Sound:** Rudyard Kipling famously called Milford Sound the 'Eighth Wonder of the World'. Its Māori name is **Piopiotahi**, meaning "a single piopio," referring to a now-extinct native bird.</li>
                             <li>**Cuisine:** Try local fare like venison, lobster, and seafood in Te Anau.</li>
                         </ul>
                     </div>
@@ -672,11 +784,12 @@
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
+                            <li>**Te Arawa Iwi:** Rotorua is the tribal home of the **Te Arawa** people, one of the primary Māori canoe groups that sailed from Hawaiki to New Zealand.</li>
+                            <li>**Hāngī Dinner:** The traditional *Hāngī* dinner is cooked using heated rocks buried in a pit oven, a method integral to Māori hospitality (`manaakitanga`).</li>
                             <li>**Pacific Ring of Fire:** Rotorua is located within this volcanic area, explaining the geothermal activity.</li>
-                            <li>**Spa Note:** Basic swimwear is recommended at Wai Ariki due to high mineral content.</li>
-                            <li>**Tribe:** Rotorua is the tribal home of the Te Arawa people.</li>
+                            <li>**Spa Culture:** The thermal baths were originally utilized by Māori for healing and relaxation; the colonial-era government built the first Rotorua Sanatorium to promote the healing properties of the mineral water.</li>
                         </ul>
                     </div>
                 </div>
@@ -691,13 +804,14 @@
                             <li>**City Highlights:** Visit the **Sky Tower** for dining or the SkyWalk/SkyJump.</li>
                             <li>**Waterfront:** Explore the **Viaduct Harbour** for dining and shopping, or take an **America's Cup sailing experience**.</li>
                             <li>**Culture:** Visit the **Auckland Museum** for daily Māori cultural performances or the **Auckland Art Gallery**.</li>
-                            <li>**Alternative:** Take a ferry to **Rangitoto Island** and hike to the summit of the volcanic cone.</li>
                         </ul>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-lg text-cyan-600">Travel Notes</h4>
+                        <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
                         <ul class="list-disc list-inside space-y-1 mt-2 text-sm">
-                            <li>**Tāmaki Makaurau:** The Māori name for Auckland, New Zealand's largest city.</li>
+                            <li>**Tāmaki Makaurau:** The Māori name for Auckland, New Zealand's largest city, refers to the region's desirability and means "Tāmaki desired by many."</li>
+                            <li>**City of Sails:** Auckland earned its nickname due to its two large harbours (Waitematā and Manukau) and the exceptionally high rate of boat ownership per capita.</li>
+                            <li>**Volcanic Field:** The city is built upon an active monogenetic volcanic field consisting of about **50 volcanic cones** (like Rangitoto Island and Mount Eden).</li>
                             <li>**Sophistication Meets Nature:** The city is known for its blend of urban culture and accessible harbours/native bush.</li>
                         </ul>
                     </div>
@@ -708,7 +822,7 @@
 
 
     </main>
-
+    
     <div id="chatbot-wrapper">
         <div id="chat-window" class="">
             <iframe
@@ -848,12 +962,249 @@
 
 
     <script>
+        // --- Map Schematic Data ---
+        // Coordinates (X, Y) are normalized to an 800x700 viewBox for scaling.
+        const mapData = [
+            // --- STAYS ---
+            { id: 'S1', type: 'Stay', city: 'Christchurch (CHCH)', day: 'Days 1-3', coord: { x: 500, y: 550 }, label: 'CHCH', color: '#dc2626', info: 'Hotel: Sudima Christchurch City (3 nights). Check-in: 11 Dec 2025 at 2:00 PM. Includes prepaid breakfast.' },
+            { id: 'S2', type: 'Stay', city: 'Lake Tekapo', day: 'Day 4', coord: { x: 400, y: 400 }, label: 'TEKAPO', color: '#dc2626', info: 'Hotel: Grand Suites Lake Tekapo (1 night). Check-in: 14 Dec 2025 at 2:00 PM. Breakfast booked at The Godley Hotel (must arrive by 8:25 AM on Day 5).' },
+            { id: 'S3', type: 'Stay', city: 'Mount Cook Village', day: 'Days 5-6', coord: { x: 300, y: 300 }, label: 'MT COOK', color: '#dc2626', info: 'Hotel: The Hermitage Hotel (2 nights). Check-in: 15 Dec 2025 at 3:00 PM. Includes Prepaid Fully Cooked Breakfast. Dinner reservations booked at Alpine Restaurant (6:00 PM Day 5, 7:00 PM Day 6).' },
+            { id: 'S4', type: 'Stay', city: 'Queenstown (QTOWN)', day: 'Days 7-9', coord: { x: 200, y: 450 }, label: 'QTOWN', color: '#dc2626', info: 'Hotel: The Central Private Hotel by Naumi Hotels (3 nights). Check-in: 17 Dec 2025 at 3:00 PM. Includes Daily Continental Breakfast and complimentary happy hour (5-6pm).' },
+            { id: 'S5', type: 'Stay', city: 'Te Anau', day: 'Days 10-11', coord: { x: 100, y: 550 }, label: 'TE ANAU', color: '#dc2626', info: 'Hotel: Fiordland Lakeview Motel & Apartments (2 nights). Check-in: 20 Dec 2025 at 2:00 PM. Breakfast booked at Distinction Te Anau Hotel (7:45 AM Dec 21 & 22).' },
+            { id: 'S6', type: 'Stay', city: 'Rotorua', day: 'Days 12-13', coord: { x: 650, y: 250 }, label: 'ROTORUA', color: '#dc2626', info: 'Hotel: Pullman Hotel Rotorua (2 nights). Check-in: 22 Dec 2025 at 2:00 PM. Includes Prepaid Breakfast.' },
+            { id: 'S7', type: 'Stay', city: 'Auckland (AKL)', day: 'Days 14-16', coord: { x: 600, y: 100 }, label: 'AKL', color: '#dc2626', info: 'Hotel: Horizon by SkyCity (2 nights). Check-in: 24 Dec 2025 at 3:00 PM. Includes Breakfast. Departure transfer scheduled for 7:20 AM on Day 16.' },
+
+            // --- TRANSITS (Start ID, End ID, Description, Class) ---
+            { id: 'T1', type: 'Transit', from: 'S1', to: 'S2', day: 'Day 4', info: 'Transit: Christchurch Station to Arthur\'s Pass via TranzAlpine Train (8:15 AM - 10:40 AM), followed by a 4-hour guided drive to Lake Tekapo.', class: 'transit-line', isRail: true, isRoad: true },
+            { id: 'T2', type: 'Transit', from: 'S2', to: 'S3', day: 'Day 5', info: 'Transit: Scenic Drive from Lake Tekapo to Mount Cook Village (96 km, 1 hr 15 mins). Route passes Lake Pukaki.', class: 'transit-line' },
+            { id: 'T3', type: 'Transit', from: 'S3', to: 'S4', day: 'Day 7', info: 'Transit: Scenic Drive from Mount Cook Village to Queenstown (264 km, 3.5 hrs). Route via Lindis Pass and Cromwell.', class: 'transit-line' },
+            { id: 'T4', type: 'Transit', from: 'S4', to: 'S5', day: 'Day 10', info: 'Transit: Drive from Queenstown to Te Anau (172 km, 2.5 hrs). Route travels alongside Lake Wakatipu.', class: 'transit-line' },
+            { id: 'T5', type: 'Transit', from: 'S5', to: 'S4', day: 'Day 12', info: 'Transit: Drive from Te Anau to Queenstown Airport (2.5 hrs). Guide delivery to airport by midday for onward flights.', class: 'transit-line' },
+            { id: 'T6', type: 'Transit', from: 'S4', to: 'S6', day: 'Day 12', info: 'Transit: Domestic Flight (NZ634) from Queenstown Airport (15:05 PM) to Rotorua Airport (19:05 PM).', class: 'flight-line', isFlight: true },
+            { id: 'T7', type: 'Transit', from: 'S6', to: 'S7', day: 'Day 14', info: 'Transit: Drive from Rotorua to Auckland (229 km, 3.5 hrs). Departure at 10:00 AM (or earlier) to arrive by 2:00 PM.', class: 'transit-line' },
+            
+            // --- EXCURSIONS (Associated Stay ID, Description, Point Coord, Color) ---
+            { id: 'E1', type: 'Excursion', assocStay: 'S1', city: 'Kaikoura Cruise', day: 'Day 3', coord: { x: 550, y: 450 }, info: 'Excursion: Whale Watch Cruise Kaikoura (1:15 PM - 4:00 PM). Day trip from Christchurch (2.5 hr drive each way).', class: 'excursion-line' },
+            { id: 'E3', type: 'Excursion', assocStay: 'S2', city: 'Stargazing', day: 'Day 4', coord: { x: 450, y: 350 }, info: 'Excursion: Summit Experience Stargazing Tour (10:00 PM - 11:45 PM). Use telescopes at the Dark Sky Reserve.', class: 'excursion-line' },
+            { id: 'E4', type: 'Excursion', assocStay: 'S3', city: 'Heli Flight', day: 'Day 5', coord: { x: 250, y: 250 }, info: 'Excursion: Aoraki/Mt Cook Ultimate Helicopter Flight (2:00 PM - 2:50 PM). Includes snow landing on Tasman Glacier.', class: 'excursion-line' },
+            { id: 'E5', type: 'Excursion', assocStay: 'S3', city: 'Glacier Explorers', day: 'Day 6', coord: { x: 350, y: 350 }, info: 'Excursion: Glacier Explorers Tour (11:30 AM - 2:15 PM). Boat trip on Tasman Glacial Lake to see icebergs.', class: 'excursion-line' },
+            { id: 'E6', type: 'Excursion', assocStay: 'S4', city: 'Walter Peak Dinner', day: 'Day 7', coord: { x: 250, y: 500 }, info: 'Excursion: TSS Earnslaw Cruise and Walter Peak High Country Gourmet Dinner (5:00 PM - 9:00 PM).', class: 'excursion-line' },
+            { id: 'E7', 'type': 'Excursion', assocStay: 'S4', city: 'Wine Tour', day: 'Day 8', coord: { x: 150, y: 500 }, info: 'Excursion: Central Otago Gourmet Food & Wine Tour (9:30 AM - 4:00 PM). Independent activity; Guide Rest Day.', class: 'excursion-line' },
+            { id: 'E8', type: 'Excursion', assocStay: 'S5', city: 'Glowworm Caves', day: 'Day 10', coord: { x: 150, y: 600 }, info: 'Excursion: Te Anau Glowworm Caves Tour (2:00 PM - 4:15 PM). Includes scenic cruise on Lake Te Anau.', class: 'excursion-line' },
+            { id: 'E2', type: 'Excursion', assocStay: 'S5', city: 'Milford Cruise', day: 'Day 11', coord: { x: 50, y: 450 }, info: 'Excursion: Milford Sound Nature Cruise (1:45 PM - 3:30 PM). Day trip from Te Anau (2.5 hr drive each way).', class: 'excursion-line' },
+            { id: 'E9', type: 'Excursion', assocStay: 'S6', city: 'Treewalk', day: 'Day 13', coord: { x: 700, y: 300 }, info: 'Excursion: Redwoods Treewalk. 700-meter long series of 28 suspension bridges, 20-metres above the forest floor.', class: 'excursion-line' },
+            { id: 'E10', type: 'Excursion', assocStay: 'S6', city: 'Hot Springs', day: 'Day 13', coord: { x: 700, y: 200 }, info: 'Excursion: Restorative Journey (Wai Ariki Hot Springs and Spa) (2:00 PM - 4:00 PM). Two-hour therapeutic experience.', class: 'excursion-line' },
+            { id: 'E11', type: 'Excursion', assocStay: 'S6', city: 'Hāngī Dinner', day: 'Day 13', coord: { x: 600, y: 300 }, info: 'Excursion: Te Pō Māori Cultural Experience + Hāngī Dinner (5:30 PM - 8:15 PM). Includes Hāngī buffet and cultural performance.', class: 'excursion-line' },
+        ];
+
+        // --- Map Drawing and Interactivity ---
+        
+        function updateInfoPanel(title, htmlContent) {
+            const panel = document.getElementById('info-panel');
+            const content = document.getElementById('info-content');
+            
+            panel.querySelector('h4').innerHTML = title;
+            content.innerHTML = htmlContent;
+        }
+
+        function generateSchematicMap() {
+            const svgContainer = document.getElementById('map-svg-container');
+            // Clear existing map and panel content
+            svgContainer.innerHTML = document.getElementById('info-panel').outerHTML; 
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // 1. Create SVG element
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('id', 'map-svg');
+            svg.setAttribute('viewBox', '0 0 800 700'); 
+            svgContainer.appendChild(svg);
+            
+            // Helper function to attach click event
+            function attachClickEvents(element, title, infoHtml) {
+                element.addEventListener('click', () => {
+                    updateInfoPanel(title, infoHtml);
+                });
+            }
+
+            // 2. Filter map data for easier lookup
+            const stays = mapData.filter(d => d.type === 'Stay');
+            const transits = mapData.filter(d => d.type === 'Transit');
+            const excursions = mapData.filter(d => d.type === 'Excursion');
+            const getStayCoord = (id) => stays.find(s => s.id === id).coord;
+
+            // 3. Draw Transits (Lines/Paths)
+            transits.forEach(t => {
+                const startCoord = getStayCoord(t.from);
+                const endCoord = getStayCoord(t.to);
+                
+                let element;
+                const title = `${t.day}: ${t.isFlight ? 'Domestic Flight' : 'Transit'}`;
+                const infoHtml = `<p><strong>Route:</strong> ${getStayCoord(t.from).label} to ${getStayCoord(t.to).label}</p><p>${t.info}</p>`;
+
+                if (t.isFlight) {
+                    element = document.createElementNS(svgNS, 'path');
+                    const c1x = (startCoord.x + endCoord.x) / 2 - 200;
+                    const c1y = (startCoord.y + endCoord.y) / 2 + 100;
+                    element.setAttribute('d', `M${startCoord.x} ${startCoord.y} C ${c1x} ${c1y}, ${c1x+400} ${c1y}, ${endCoord.x} ${endCoord.y}`);
+                    element.setAttribute('class', 'flight-line');
+                } else {
+                    element = document.createElementNS(svgNS, 'line');
+                    element.setAttribute('x1', startCoord.x);
+                    element.setAttribute('y1', startCoord.y);
+                    element.setAttribute('x2', endCoord.x);
+                    element.setAttribute('y2', endCoord.y);
+                    element.setAttribute('class', 'transit-line');
+                }
+                
+                attachClickEvents(element, title, infoHtml);
+                svg.appendChild(element);
+            });
+
+            // 4. Draw Excursions (Points & Lines)
+            excursions.forEach(e => {
+                const stayCoord = getStayCoord(e.assocStay);
+
+                // Line from Stay Point to Excursion Point
+                const line = document.createElementNS(svgNS, 'line');
+                line.setAttribute('x1', stayCoord.x);
+                line.setAttribute('y1', stayCoord.y);
+                line.setAttribute('x2', e.coord.x);
+                line.setAttribute('y2', e.coord.y);
+                line.setAttribute('class', 'excursion-line');
+                svg.appendChild(line);
+
+                // Excursion Point (Small Circle)
+                const point = document.createElementNS(svgNS, 'circle');
+                point.setAttribute('cx', e.coord.x);
+                point.setAttribute('cy', e.coord.y);
+                point.setAttribute('r', 8);
+                point.setAttribute('class', 'excursion-point');
+                
+                const title = `${e.day}: ${e.city}`;
+                const infoHtml = `<p>${e.info}</p>`;
+                
+                // Attach click events to both the point and the line
+                [point, line].forEach(el => {
+                    attachClickEvents(el, title, infoHtml);
+                });
+
+                svg.appendChild(point);
+
+                // Add text label for the excursion
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', e.coord.x);
+                text.setAttribute('y', e.coord.y + 15);
+                text.setAttribute('font-size', '14');
+                text.setAttribute('fill', '#059669');
+                text.setAttribute('text-anchor', 'middle');
+                text.textContent = e.city;
+                svg.appendChild(text);
+                attachClickEvents(text, title, infoHtml); // Also make text clickable
+            });
+
+            // 5. Draw Stays (Red Circles)
+            stays.forEach(s => {
+                const circle = document.createElementNS(svgNS, 'circle');
+                circle.setAttribute('cx', s.coord.x);
+                circle.setAttribute('cy', s.coord.y);
+                circle.setAttribute('r', 12);
+                circle.setAttribute('class', 'stay-point');
+
+                const title = `${s.city} Stay`;
+                const infoHtml = `<p>${s.info}</p>`;
+                
+                attachClickEvents(circle, title, infoHtml);
+                svg.appendChild(circle);
+
+                // Add text label for the stay
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', s.coord.x);
+                text.setAttribute('y', s.coord.y - 15);
+                text.setAttribute('font-size', '16');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('fill', '#dc2626');
+                text.setAttribute('text-anchor', 'middle');
+                text.textContent = s.label;
+                svg.appendChild(text);
+                attachClickEvents(text, title, infoHtml); // Also make text clickable
+                
+                // 6. Set default info panel to Christchurch (S1)
+                if (s.id === 'S1') {
+                     updateInfoPanel(title, infoHtml);
+                }
+            });
+            
+            // Add a simple legend (optional but helpful)
+            const legendGroup = document.createElementNS(svgNS, 'g');
+            legendGroup.setAttribute('transform', 'translate(10, 10)');
+            
+            const legendBg = document.createElementNS(svgNS, 'rect');
+            legendBg.setAttribute('x', 0); legendBg.setAttribute('y', 0);
+            legendBg.setAttribute('width', 200); legendBg.setAttribute('height', 90); /* Increased height for one more line */
+            legendBg.setAttribute('fill', 'rgba(255, 255, 255, 0.7)');
+            legendBg.setAttribute('rx', 5);
+            legendGroup.appendChild(legendBg);
+
+            const legendItems = [
+                { color: '#dc2626', text: 'Stay (Click for Hotel/Dates)', y: 15 },
+                { color: '#2563eb', text: 'Road/Rail Transit (Click for Route)', y: 35 },
+                { color: '#10b981', text: 'Excursion (Click for Activity/Time)', y: 55 },
+                { color: '#6b7280', text: 'Domestic Flight (Click for Flight)', y: 75 },
+            ];
+            
+            legendItems.forEach((item, index) => {
+                const itemGroup = document.createElementNS(svgNS, 'g');
+                itemGroup.setAttribute('transform', `translate(10, ${item.y})`);
+                
+                if (item.text.includes('Stay')) {
+                    const symbol = document.createElementNS(svgNS, 'circle');
+                    symbol.setAttribute('cx', 5);
+                    symbol.setAttribute('cy', -4);
+                    symbol.setAttribute('r', 4);
+                    symbol.setAttribute('fill', item.color);
+                    itemGroup.appendChild(symbol);
+                } else if (item.text.includes('Excursion')) {
+                    const symbol = document.createElementNS(svgNS, 'circle');
+                    symbol.setAttribute('cx', 5);
+                    symbol.setAttribute('cy', -4);
+                    symbol.setAttribute('r', 4);
+                    symbol.setAttribute('fill', '#059669');
+                    itemGroup.appendChild(symbol);
+                } else {
+                    const symbol = document.createElementNS(svgNS, 'line');
+                    symbol.setAttribute('x1', 0);
+                    symbol.setAttribute('y1', -4);
+                    symbol.setAttribute('x2', 10);
+                    symbol.setAttribute('y2', -4);
+                    symbol.setAttribute('stroke', item.color);
+                    symbol.setAttribute('stroke-width', 2);
+                    if (item.text.includes('Flight')) {
+                        symbol.setAttribute('stroke-dasharray', '3 1');
+                    } else if (item.text.includes('Excursion')) {
+                        symbol.setAttribute('stroke-dasharray', '1 1');
+                    }
+                    itemGroup.appendChild(symbol);
+                }
+                
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', 15);
+                text.setAttribute('y', 0);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('fill', '#1f2937');
+                text.textContent = item.text;
+                legendGroup.appendChild(text);
+            });
+
+            svg.appendChild(legendGroup);
+        }
+
         // --- Tab Functionality ---
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             const excursionContents = document.querySelectorAll('.excursion-content');
-            const initialTargetId = "Christchurch"; // Default tab ID
+            const initialTargetId = "Overview";
+            let mapGenerated = false;
 
             function setActiveTab(targetId) {
                 // 1. Hide all itinerary contents
@@ -878,7 +1229,7 @@
                     targetContent.classList.remove('hidden');
                 }
 
-                // 5. Show the target excursion content
+                // 5. Show the target excursion content (if one exists for the targetId)
                 const targetExcursion = document.querySelector(`[data-excursion-for="${targetId}"]`);
                 if (targetExcursion) {
                     targetExcursion.classList.remove('hidden');
@@ -890,6 +1241,12 @@
                     activeTab.classList.add('border-cyan-500', 'text-cyan-600', 'font-semibold');
                     activeTab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-cyan-600');
                 }
+                
+                // 7. Generate map if TourMap is selected and it hasn't been generated yet
+                if (targetId === "TourMap" && !mapGenerated) {
+                    generateSchematicMap();
+                    mapGenerated = true;
+                }
             }
 
             tabs.forEach(tab => {
@@ -899,7 +1256,7 @@
                 });
             });
 
-            // Initialize: set the first tab (Christchurch) as active on load
+            // Initialize: set the first tab (Overview) as active on load
             setActiveTab(initialTargetId);
         });
 
