@@ -178,7 +178,7 @@
             stroke-width: 2;
         }
         .stay-point:hover {
-            filter: brightness(1.2); 
+            filter: brightness(1.2); /* Subtle visual hint without jumping */
         }
         .transit-line {
             stroke: #2563eb; /* Blue */
@@ -853,6 +853,7 @@
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script>
         // Global array to hold all sphere objects for manipulation
@@ -1005,6 +1006,8 @@
             { id: 'E5', type: 'Excursion', assocStay: 'S3', city: 'Glacier Explorers', day: 'Day 6', coord: { x: 350, y: 350 }, info: 'Excursion: Glacier Explorers Tour (11:30 AM - 2:15 PM). Boat trip on Tasman Glacial Lake to see icebergs.', class: 'excursion-line' },
             { id: 'E6', type: 'Excursion', assocStay: 'S4', city: 'Walter Peak Dinner', day: 'Day 7', coord: { x: 250, y: 500 }, info: 'Excursion: TSS Earnslaw Cruise and Walter Peak High Country Gourmet Dinner (5:00 PM - 9:00 PM).', class: 'excursion-line' },
             { id: 'E7', 'type': 'Excursion', assocStay: 'S4', city: 'Wine Tour', day: 'Day 8', coord: { x: 150, y: 500 }, info: 'Excursion: Central Otago Gourmet Food & Wine Tour (9:30 AM - 4:00 PM). Independent activity; Guide Rest Day.', class: 'excursion-line' },
+            // ADDED WANAKA EXCURSION
+            { id: 'E12', type: 'Excursion', assocStay: 'S4', city: 'Wanaka Excursion', day: 'Day 9', coord: { x: 150, y: 400 }, info: 'Excursion: Day Trip to Wanaka (1.5 hr drive each way). Stops suggested: Cardrona Hotel/Distillery, Wanaka Tree, or exploring the lakefront.', class: 'excursion-line' },
             { id: 'E8', type: 'Excursion', assocStay: 'S5', city: 'Glowworm Caves', day: 'Day 10', coord: { x: 150, y: 600 }, info: 'Excursion: Te Anau Glowworm Caves Tour (2:00 PM - 4:15 PM). Includes scenic cruise on Lake Te Anau.', class: 'excursion-line' },
             { id: 'E2', type: 'Excursion', assocStay: 'S5', city: 'Milford Cruise', day: 'Day 11', coord: { x: 50, y: 450 }, info: 'Excursion: Milford Sound Nature Cruise (1:45 PM - 3:30 PM). Day trip from Te Anau (2.5 hr drive each way).', class: 'excursion-line' },
             { id: 'E9', type: 'Excursion', assocStay: 'S6', city: 'Treewalk', day: 'Day 13', coord: { x: 700, y: 300 }, info: 'Excursion: Redwoods Treewalk. 700-meter long series of 28 suspension bridges, 20-metres above the forest floor.', class: 'excursion-line' },
@@ -1104,6 +1107,7 @@
                         // T6: Queenstown -> Rotorua (Flight) - Uses Cubic Bézier (C) for wide separation
                         element = d3.select(this).append("path")
                             .attr("class", "flight-line");
+                        // Control points: C(x1, y1, x2, y2)
                         const c1x = (startCoord.x + endCoord.x) / 2 - 200;
                         const c1y = (startCoord.y + endCoord.y) / 2 + 100;
                         element.attr('d', `M${startCoord.x} ${startCoord.y} C ${c1x} ${c1y}, ${c1x+400} ${c1y}, ${endCoord.x} ${endCoord.y}`);
@@ -1183,7 +1187,6 @@
                     .attr('r', 12);
                 attachClickEvents(circle, s);
 
-                // Add text label for the stay
                 const text = svg.append("text")
                     .attr('x', s.coord.x)
                     .attr('y', s.coord.y - 15)
