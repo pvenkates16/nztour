@@ -167,15 +167,14 @@
             position: relative; /* SVG needed for z-index */
             z-index: 1;
         }
-        /* Removed transform/size-changing hover to ensure stability on click interaction */
         .stay-point, .transit-line, .excursion-line, .excursion-point, .flight-line {
             transition: all 0.2s ease-in-out; 
             cursor: pointer;
         }
         
         .stay-point {
-            fill: #dc2626; /* Red */
-            stroke: #991b1b;
+            /* Fill is set by D3 to use a gradient URL, not a solid color */
+            stroke: #b91c1c; /* Softened red stroke */
             stroke-width: 2;
         }
         .stay-point:hover {
@@ -199,8 +198,8 @@
             filter: brightness(1.2);
         }
         .excursion-point {
-            fill: #059669; /* Darker Green */
-            stroke: #10b981;
+            /* Fill is set by D3 to use a gradient URL, not a solid color */
+            stroke: #059669; /* Darker green stroke */
             stroke-width: 2;
         }
         .excursion-point:hover {
@@ -285,6 +284,22 @@
                         <p class="text-gray-600 mb-6">
                             In contrast, Australia's Indigenous history stretches back much further, with Aboriginal Australians arriving from Indonesia or New Guinea around **50,000 to 65,000 years ago**.
                         </p>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-700">Reasons for Migration to Aotearoa (NZ) and Australia</h3>
+                        <div class="space-y-3 text-gray-600 mb-6">
+                            <p>
+                                <span class="font-medium text-cyan-600">Polynesians (Māori ancestors) to NZ:</span> These initial migrations were **planned voyages of exploration** driven by **curiosity, prestige, or a spirit of adventure** to find new lands. They sought a **vast, resource-rich land** with abundant wildlife (like the Moa) and forests, or were looking for a better life away from pressures in their tropical homelands.
+                            </p>
+                            <p>
+                                <span class="font-medium text-cyan-600">Aboriginal Ancestors to Australia:</span> The ancestors of Aboriginal Australians arrived as part of the **single "Out of Africa" migration wave** of modern humans, migrating along the Southern Route to explore the continent when **lower sea levels created land bridges** connecting Asia and Australia.
+                            </p>
+                            <p>
+                                <span class="font-medium text-cyan-600">English/Europeans (Pākehā) to NZ:</span> Settlers aimed to create a **"better Britain,"** free from the poverty and rigid class system of the UK. A major draw was the **prospect of owning land**, which was inaccessible to many in the UK, and the belief that the temperate climate would be **good for their families' health**. Early arrivals also included whalers, sealers, and missionaries.
+                            </p>
+                            <p>
+                                <span class="font-medium text-cyan-600">English/Europeans to Australia:</span> The initial 1788 settlement was established as a **penal colony to relieve overcrowded British prisons** and serve as a **strategic British naval base** in the Southern Hemisphere. Later waves of free settlers were primarily motivated by **economic opportunities** such as gold rushes, mineral mining, and wool farming.
+                            </p>
+                        </div>
+                        
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">A Tale of Two Colonies: NZ vs. Australia</h3>
                         <div class="space-y-3 text-gray-600">
                             <p>
@@ -710,7 +725,7 @@
                             <li>**Hiking:** The **Hooker Valley Track** is a famous, relatively flat day walk offering stunning views of Mt Cook and crossing three swing bridges (allow 2-4 hours return).</li>
                             <li>**Short Walk:** The **Kea Point Track** is a shorter walk (approx. 1 hour return) from the campground to a glacial lake viewpoint.</li>
                             <li>**Culture:** Visit the **Sir Edmund Hillary Alpine Centre** to learn about the history of climbing and exploration in the Southern Alps.</li>
-                        </ul>
+                            </ul>
                     </div>
                     <div>
                         <h4 class="font-semibold text-lg text-cyan-600">Culture & History Commentary</h4>
@@ -1013,7 +1028,9 @@
             // 1. CLEAR: Remove only the previous SVG element if it exists
             svgContainer.select("#map-svg").remove();
             
-            // 2. Create SVG element and append it (it will render behind the info-panel due to z-index)
+            const svgNS = "http://www.w3.org/2000/svg";
+            
+            // 2. Create SVG element and append it
             const svg = svgContainer.append("svg")
                 .attr("id", "map-svg")
                 .attr("viewBox", "0 0 800 700"); 
@@ -1021,7 +1038,27 @@
             // Helper function to fetch the full stay object
             const getStayObject = (id) => mapData.find(d => d.id === id && d.type === 'Stay');
 
-            // 3. Filter data
+            // 3. Define Radial Gradients for 3D/Shine Effect
+            const defs = svg.append("defs");
+
+            // Red Stay Gradient (Softened Look)
+            const stayGradient = defs.append("radialGradient")
+                .attr("id", "stayGradient")
+                .attr("cx", "30%").attr("cy", "30%").attr("r", "100%");
+            
+            stayGradient.append("stop").attr("offset", "0%").attr("stop-color", "#fca5a5"); // Red-300 (Lightest)
+            stayGradient.append("stop").attr("offset", "100%").attr("stop-color", "#ef4444"); // Red-500 (Base)
+
+            // Green Excursion Gradient (Softened Look)
+            const excursionGradient = defs.append("radialGradient")
+                .attr("id", "excursionGradient")
+                .attr("cx", "30%").attr("cy", "30%").attr("r", "100%");
+
+            excursionGradient.append("stop").attr("offset", "0%").attr("stop-color", "#6ee7b7"); // Emerald-300 (Lightest)
+            excursionGradient.append("stop").attr("offset", "100%").attr("stop-color", "#34d399"); // Emerald-400 (Base)
+
+
+            // 4. Filter data
             const stays = mapData.filter(d => d.type === 'Stay');
             const transits = mapData.filter(d => d.type === 'Transit');
             const excursions = mapData.filter(d => d.type === 'Excursion');
@@ -1048,7 +1085,7 @@
                 });
             };
 
-            // 4. Draw Transits (Lines/Paths)
+            // 5. Draw Transits (Lines/Paths)
             svg.selectAll(".transit-element")
                 .data(transits)
                 .enter()
@@ -1064,14 +1101,27 @@
                     let element;
 
                     if (d.isFlight) {
-                        // Create curved path for Queenstown to Rotorua flight
+                        // T6: Queenstown -> Rotorua (Flight) - Uses Cubic Bézier (C) for wide separation
                         element = d3.select(this).append("path")
                             .attr("class", "flight-line");
                         const c1x = (startCoord.x + endCoord.x) / 2 - 200;
                         const c1y = (startCoord.y + endCoord.y) / 2 + 100;
                         element.attr('d', `M${startCoord.x} ${startCoord.y} C ${c1x} ${c1y}, ${c1x+400} ${c1y}, ${endCoord.x} ${endCoord.y}`);
+                    } else if (d.id === 'T4' || d.id === 'T5') {
+                        // T4 (S4 -> S5) & T5 (S5 -> S4) - Overlapping road segments. Use Quadratic Bézier (Q).
+                        element = d3.select(this).append("path")
+                            .attr("class", d.class);
+                        
+                        // Control points: S4(200, 450) <-> S5(100, 550)
+                        if (d.id === 'T4') {
+                             // S4 -> S5 (Inward curve: Q 180, 480)
+                             element.attr('d', `M${startCoord.x},${startCoord.y} Q 180,480 ${endCoord.x},${endCoord.y}`);
+                        } else {
+                             // T5 (S5 -> S4) (Outward curve: Q 120, 520)
+                            element.attr('d', `M${startCoord.x},${startCoord.y} Q 120,520 ${endCoord.x},${endCoord.y}`);
+                        }
                     } else {
-                        // Straight line for road/rail travel
+                        // Straight line for all other transits (T1, T2, T3, T7)
                         element = d3.select(this).append("line")
                             .attr("class", "transit-line")
                             .attr('x1', startCoord.x)
@@ -1083,7 +1133,7 @@
                     attachClickEvents(element, d);
                 });
 
-            // 5. Draw Excursions (Points & Lines)
+            // 6. Draw Excursions (Points & Lines)
             svg.selectAll(".excursion-element")
                 .data(excursions)
                 .enter()
@@ -1104,6 +1154,8 @@
                     // Excursion Point (Small Circle)
                     const point = d3.select(this).append("circle")
                         .attr("class", "excursion-point")
+                        // Apply gradient fill
+                        .attr("fill", "url(#excursionGradient)")
                         .attr('cx', d.coord.x)
                         .attr('cy', d.coord.y)
                         .attr('r', 8);
@@ -1120,33 +1172,33 @@
                     attachClickEvents(text, d);
                 });
 
-            // 6. Draw Stays (Red Circles)
-            svg.selectAll(".stay-label")
-                .data(stays)
-                .enter()
-                .each(function(d) {
-                    const circle = d3.select(this).append("circle")
-                        .attr("class", "stay-point")
-                        .attr('cx', d.coord.x)
-                        .attr('cy', d.coord.y)
-                        .attr('r', 12);
-                    attachClickEvents(circle, d);
+            // 7. Draw Stays (Red Circles)
+            stays.forEach(s => {
+                const circle = svg.append("circle")
+                    .attr("class", "stay-point")
+                    // Apply gradient fill
+                    .attr("fill", "url(#stayGradient)")
+                    .attr('cx', s.coord.x)
+                    .attr('cy', s.coord.y)
+                    .attr('r', 12);
+                attachClickEvents(circle, s);
 
-                    const text = d3.select(this).append("text")
-                        .attr('x', d.coord.x)
-                        .attr('y', d.coord.y - 15)
-                        .attr('font-size', '16')
-                        .attr('font-weight', 'bold')
-                        .attr('fill', '#dc2626')
-                        .attr('text-anchor', 'middle')
-                        .text(d.label);
-                    attachClickEvents(text, d);
+                // Add text label for the stay
+                const text = svg.append("text")
+                    .attr('x', s.coord.x)
+                    .attr('y', s.coord.y - 15)
+                    .attr('font-size', '16')
+                    .attr('font-weight', 'bold')
+                    .attr('fill', '#dc2626')
+                    .attr('text-anchor', 'middle')
+                    .text(s.label);
+                attachClickEvents(text, s);
                 
-                    // 7. Set default info panel to Christchurch (S1)
-                    if (d.id === 'S1') {
-                         updateInfoPanel(`${d.city} Stay`, `<p>${d.info}</p>`);
-                    }
-                });
+                // 8. Set default info panel to Christchurch (S1)
+                if (s.id === 'S1') {
+                     updateInfoPanel(`${s.city} Stay`, `<p>${s.info}</p>`);
+                }
+            });
         }
 
         // --- Tab Functionality ---
@@ -1194,9 +1246,8 @@
                 }
                 
                 // 7. Generate map if TourMap is selected and it hasn't been generated yet
-                // Use generateD3Map() now
                 if (targetId === "TourMap" && !mapGenerated) {
-                    generateD3Map();
+                    generateD3Map(); // Using the D3 generation function
                     mapGenerated = true;
                 }
             }
