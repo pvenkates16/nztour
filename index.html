@@ -167,7 +167,7 @@
             z-index: 1;
         }
         .stay-point, .transit-line, .excursion-line, .excursion-point, .flight-line {
-            transition: all 0.2s ease-in-out; /* Enable smooth transitions for hover */
+            transition: all 0.2s ease-in-out; 
         }
         
         .stay-point {
@@ -177,7 +177,7 @@
             cursor: pointer;
         }
         .stay-point:hover {
-            transform: scale(1.3);
+            filter: brightness(1.2); /* Subtle visual hint without jumping */
         }
         .transit-line {
             stroke: #2563eb; /* Blue */
@@ -186,7 +186,7 @@
             cursor: pointer;
         }
         .transit-line:hover {
-            stroke-width: 5;
+            filter: brightness(1.2);
         }
         .excursion-line {
             stroke: #10b981; /* Green */
@@ -196,7 +196,7 @@
             stroke-dasharray: 4 2;
         }
         .excursion-line:hover {
-             stroke-width: 3;
+            filter: brightness(1.2);
         }
         .excursion-point {
             fill: #059669; /* Darker Green */
@@ -205,7 +205,7 @@
             cursor: pointer;
         }
         .excursion-point:hover {
-            transform: scale(1.4);
+            filter: brightness(1.2);
         }
         .flight-line {
             stroke: #6b7280; /* Grey */
@@ -215,7 +215,7 @@
             cursor: pointer;
         }
         .flight-line:hover {
-            stroke-width: 6;
+            filter: brightness(1.2);
         }
 
         /* --- INFO PANEL STYLES --- */
@@ -289,10 +289,10 @@
                         <h3 class="text-xl font-semibold mb-3 text-gray-700">A Tale of Two Colonies: NZ vs. Australia</h3>
                         <div class="space-y-3 text-gray-600">
                             <p>
-                                <span class="font-medium text-cyan-600">Indigenous History:</span> Māori were agriculturalists with strong warrior traditions, capable of organized resistance. (<a href="https://teara.govt.nz/en/maori#:~:text=Early%20settlement,and%20strong%20traditions%20of%20warfare." target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about Māori history</a>). Aboriginal Australians were primarily hunter-gatherers.
+                                <span class="font-medium text-cyan-600">Indigenous History:</span> Māori were agriculturalists with strong warrior traditions, capable of organized resistance. Aboriginal Australians were primarily hunter-gatherers.
                             </p>
                             <p>
-                                <span class="font-medium text-cyan-600">Colonial Foundation:</span> Australia was founded in 1788 as a penal colony (New South Wales), based on the legal concept of *Terra Nullius* (land belonging to no one). New Zealand's foundation was dramatically different, secured in 1840 through the **Treaty of Waitangi** (`Te Tiriti o Waitangi`) between the British Crown and Māori chiefs, guaranteeing certain rights in exchange for sovereignty. (<a href="https://teara.govt.nz/en/historic-places/page-1" target="_blank" class="text-blue-600 hover:text-blue-800 underline transition duration-150">Learn more about historic colonial places</a>).
+                                <span class="font-medium text-cyan-600">Colonial Foundation:</span> Australia was founded in 1788 as a penal colony (New South Wales), based on the legal concept of *Terra Nullius* (land belonging to no one). New Zealand's foundation was dramatically different, secured in 1840 through the **Treaty of Waitangi** (`Te Tiriti o Waitangi`) between the British Crown and Māori chiefs, guaranteeing certain rights in exchange for sovereignty.
                             </p>
                             <p>
                                 <span class="font-medium text-cyan-600">Settler Class:</span> Early Australian settlers included large numbers of lower-class immigrants and convicts. New Zealand tended to attract a different class of settler, often associated with commercially organized settlement companies and more middle-class religious groups.
@@ -310,7 +310,7 @@
                             <h4>Tour Information</h4>
                             <p id="info-content">Click an element on the map to see details about the stay, transit, or excursion.</p>
                         </div>
-                        </div>
+                    </div>
                 </div>
                 
                 <div data-tab-content="Christchurch" class="tab-content hidden">
@@ -1009,11 +1009,16 @@
 
         function generateSchematicMap() {
             const svgContainer = document.getElementById('map-svg-container');
-            // Clear existing map and panel content
-            svgContainer.innerHTML = document.getElementById('info-panel').outerHTML; 
+            
+            // 1. CLEAR: Remove only the previous SVG element if it exists
+            let existingSvg = document.getElementById('map-svg');
+            if (existingSvg) {
+                existingSvg.remove();
+            }
+            
             const svgNS = "http://www.w3.org/2000/svg";
             
-            // 1. Create SVG element
+            // 2. Create SVG element and append it (it will render behind the info-panel due to z-index)
             const svg = document.createElementNS(svgNS, 'svg');
             svg.setAttribute('id', 'map-svg');
             svg.setAttribute('viewBox', '0 0 800 700'); 
@@ -1026,20 +1031,33 @@
                 });
             }
 
-            // 2. Filter map data for easier lookup
+            // 3. Filter map data and helper function
             const stays = mapData.filter(d => d.type === 'Stay');
             const transits = mapData.filter(d => d.type === 'Transit');
             const excursions = mapData.filter(d => d.type === 'Excursion');
-            const getStayCoord = (id) => stays.find(s => s.id === id).coord;
+            
+            // FIX: Helper returns the whole stay object
+            const getStayObject = (id) => stays.find(s => s.id === id);
 
-            // 3. Draw Transits (Lines/Paths)
+            // 4. Draw Transits (Lines/Paths)
             transits.forEach(t => {
-                const startCoord = getStayCoord(t.from);
-                const endCoord = getStayCoord(t.to);
+                // Fetch full objects to access both label and coord
+                const startStay = getStayObject(t.from); 
+                const endStay = getStayObject(t.to);     
+
+                // Check if stays were found to prevent errors
+                if (!startStay || !endStay) {
+                    console.error(`Missing stay data for transit ${t.id}: From ${t.from} to ${t.to}`);
+                    return; 
+                }
+
+                const startCoord = startStay.coord; 
+                const endCoord = endStay.coord;     
                 
                 let element;
                 const title = `${t.day}: ${t.isFlight ? 'Domestic Flight' : 'Transit'}`;
-                const infoHtml = `<p><strong>Route:</strong> ${getStayCoord(t.from).label} to ${getStayCoord(t.to).label}</p><p>${t.info}</p>`;
+                // FIX: Accessing the .label property from the fetched stay objects
+                const infoHtml = `<p><strong>Route:</strong> ${startStay.label} to ${endStay.label}</p><p>${t.info}</p>`;
 
                 if (t.isFlight) {
                     element = document.createElementNS(svgNS, 'path');
@@ -1060,9 +1078,10 @@
                 svg.appendChild(element);
             });
 
-            // 4. Draw Excursions (Points & Lines)
+            // 5. Draw Excursions (Points & Lines)
             excursions.forEach(e => {
-                const stayCoord = getStayCoord(e.assocStay);
+                const stayObject = getStayObject(e.assocStay);
+                const stayCoord = stayObject ? stayObject.coord : { x: 0, y: 0 }; // Default if missing, though it shouldn't be
 
                 // Line from Stay Point to Excursion Point
                 const line = document.createElementNS(svgNS, 'line');
@@ -1102,7 +1121,7 @@
                 attachClickEvents(text, title, infoHtml); // Also make text clickable
             });
 
-            // 5. Draw Stays (Red Circles)
+            // 6. Draw Stays (Red Circles)
             stays.forEach(s => {
                 const circle = document.createElementNS(svgNS, 'circle');
                 circle.setAttribute('cx', s.coord.x);
@@ -1128,74 +1147,11 @@
                 svg.appendChild(text);
                 attachClickEvents(text, title, infoHtml); // Also make text clickable
                 
-                // 6. Set default info panel to Christchurch (S1)
+                // 7. Set default info panel to Christchurch (S1)
                 if (s.id === 'S1') {
                      updateInfoPanel(title, infoHtml);
                 }
             });
-            
-            // Add a simple legend (optional but helpful)
-            const legendGroup = document.createElementNS(svgNS, 'g');
-            legendGroup.setAttribute('transform', 'translate(10, 10)');
-            
-            const legendBg = document.createElementNS(svgNS, 'rect');
-            legendBg.setAttribute('x', 0); legendBg.setAttribute('y', 0);
-            legendBg.setAttribute('width', 200); legendBg.setAttribute('height', 90); /* Increased height for one more line */
-            legendBg.setAttribute('fill', 'rgba(255, 255, 255, 0.7)');
-            legendBg.setAttribute('rx', 5);
-            legendGroup.appendChild(legendBg);
-
-            const legendItems = [
-                { color: '#dc2626', text: 'Stay (Click for Hotel/Dates)', y: 15 },
-                { color: '#2563eb', text: 'Road/Rail Transit (Click for Route)', y: 35 },
-                { color: '#10b981', text: 'Excursion (Click for Activity/Time)', y: 55 },
-                { color: '#6b7280', text: 'Domestic Flight (Click for Flight)', y: 75 },
-            ];
-            
-            legendItems.forEach((item, index) => {
-                const itemGroup = document.createElementNS(svgNS, 'g');
-                itemGroup.setAttribute('transform', `translate(10, ${item.y})`);
-                
-                if (item.text.includes('Stay')) {
-                    const symbol = document.createElementNS(svgNS, 'circle');
-                    symbol.setAttribute('cx', 5);
-                    symbol.setAttribute('cy', -4);
-                    symbol.setAttribute('r', 4);
-                    symbol.setAttribute('fill', item.color);
-                    itemGroup.appendChild(symbol);
-                } else if (item.text.includes('Excursion')) {
-                    const symbol = document.createElementNS(svgNS, 'circle');
-                    symbol.setAttribute('cx', 5);
-                    symbol.setAttribute('cy', -4);
-                    symbol.setAttribute('r', 4);
-                    symbol.setAttribute('fill', '#059669');
-                    itemGroup.appendChild(symbol);
-                } else {
-                    const symbol = document.createElementNS(svgNS, 'line');
-                    symbol.setAttribute('x1', 0);
-                    symbol.setAttribute('y1', -4);
-                    symbol.setAttribute('x2', 10);
-                    symbol.setAttribute('y2', -4);
-                    symbol.setAttribute('stroke', item.color);
-                    symbol.setAttribute('stroke-width', 2);
-                    if (item.text.includes('Flight')) {
-                        symbol.setAttribute('stroke-dasharray', '3 1');
-                    } else if (item.text.includes('Excursion')) {
-                        symbol.setAttribute('stroke-dasharray', '1 1');
-                    }
-                    itemGroup.appendChild(symbol);
-                }
-                
-                const text = document.createElementNS(svgNS, 'text');
-                text.setAttribute('x', 15);
-                text.setAttribute('y', 0);
-                text.setAttribute('font-size', '12');
-                text.setAttribute('fill', '#1f2937');
-                text.textContent = item.text;
-                legendGroup.appendChild(text);
-            });
-
-            svg.appendChild(legendGroup);
         }
 
         // --- Tab Functionality ---
