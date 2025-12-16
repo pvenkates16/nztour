@@ -1065,6 +1065,7 @@
             const transits = mapData.filter(d => d.type === 'Transit');
             const excursions = mapData.filter(d => d.type === 'Excursion');
             
+
             // Helper function to attach click event (D3 binding)
             const attachClickEvents = (selection, d) => {
                 let title, infoHtml;
@@ -1083,10 +1084,20 @@
                     infoHtml = `<p>${d.info}</p>`;
                 }
 
+                // CORRECTION: Add touchstart listener to ensure responsiveness on mobile/touch devices.
+                // It calls the same logic as 'click'.
+                selection.on('touchstart', function(event) {
+                    event.preventDefault(); // Prevents default touch behavior (e.g., scrolling)
+                    updateInfoPanel(title, infoHtml);
+                });
+
+                // Keep the 'click' listener for desktop support
                 selection.on('click', () => {
                     updateInfoPanel(title, infoHtml);
                 });
             };
+
+
 
             // 5. Draw Transits (Lines/Paths)
             svg.selectAll(".transit-element")
